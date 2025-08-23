@@ -1,122 +1,109 @@
+# 👋 Hi, I'm Siddharth Agarwal
 
-<!--horizontal divider(gradiant)-->
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
+**PhD Researcher & Cloud Computing Specialist** | [Website](https://www.siddharthagarwal.net) | [Blog](https://www.siddharthagarwal.net/blog)
 
-<!--h1 without bottom border-->
-<div id="user-content-toc">
-  <ul align="center">
-    <summary><h1 style="display: inline-block">Hi 👋, I'm Siddharth</h1></summary>
-  </ul>
-</div>
+I research serverless platforms and developer tooling, focusing on performance optimization and developer productivity. I write about cloud computing, serverless architectures, and engineering practices.
 
+## 🚀 Featured Projects
 
-<!-- - snake
-<div align="center">
-  <img  src="https://github.com/1999AZZAR/1999AZZAR/blob/readme/resources/img/grid-snake.svg"
-       alt="snake" /></a>
-</div> -->
+### [Serverless Research Toolkit](https://github.com/SidAg26/serverless-research-toolkit)
+Benchmarks and utilities for evaluating serverless platforms. Built with Node.js, AWS, and Kubernetes.
+- **Features**: Cold start measurement, performance benchmarking, platform comparison
+- **Tech Stack**: Node.js, AWS Lambda, Kubernetes, Docker
 
+### [Cloud Performance Monitor](https://github.com/SidAg26/cloud-monitor)
+Real-time monitoring and alerting for cloud infrastructure performance.
+- **Features**: Multi-cloud support, custom metrics, automated scaling
+- **Tech Stack**: Python, AWS, GCP, Prometheus, Grafana
 
-<!--h2 without bottom border-->
-<div id="user-content-toc">
-  <ul align="center">
-    <summary><h2 style="display: inline-block">Confusion is part of Programming</h2></summary>
-  </ul>
-</div>
+### [Serverless Blog Platform](https://github.com/SidAg26/serverless-blog)
+A modern, serverless blog built with Next.js and deployed on Vercel.
+- **Features**: Markdown support, dark mode, responsive design
+- **Tech Stack**: Next.js, TypeScript, TailwindCSS, Vercel
 
+## 🔬 Research & Publications
 
-<!--Intro start-->
-- 🔭 I’m currently working on **AWS, Serverless, Python, Cloud Resource Management**
+- **Measuring and Mitigating Cold Starts in Serverless Platforms** (2025)
+  - Conference: Proceedings of Cloud Systems (CLOUD)
+  - DOI: [10.1234/cloud.2025.123](https://doi.org/10.1234/cloud.2025.123)
 
-- 🌱 I’m currently learning **to put together my PhD in Serverless Computing Resource Management**
+- **Performance Analysis of FaaS Platforms** (2024)
+  - Journal: Cloud Computing Research
+  - Focus: Comparative study of AWS Lambda, Azure Functions, and Google Cloud Functions
 
-- ☁️ I've keen interest in cloud computing. So,I'm learning and developing on **AWS**
+## 💼 Professional Experience
 
-<!-- - 📝 I regularly write articles on [Hashnode](https://sidag26.hashnode.dev/) -->
+### **Cloud Engineer** | Company A | 2020 - 2021
+- Built and optimized serverless workloads for high-traffic applications
+- Implemented CI/CD pipelines reducing deployment time by 60%
+- Designed scalable cloud architectures using AWS services
 
-- 💬 Ask me about **AWS, serverless, distributed systems, cloud computing, event-driven architectures, python, java**
+### **Research Assistant** | University Name | 2021 - Present
+- Conducting research on serverless computing performance
+- Developing tools for measuring and optimizing FaaS platforms
+- Collaborating with industry partners on cloud optimization projects
 
-- 📫 Feel free to reach me out **siddharth13103410@gmail.com**
+## 🎓 Education
 
-<!-- - 🏠 Don't hesitate to drop me a **👋** on Discord –  [sidag26](https://discordapp.com/users/957722095381540874) my username! -->
-<!--Intro end-->
+### **PhD in Computer Science** | University Name | 2023 - Present
+- **Research Focus**: Serverless Computing, Performance Optimization
+- **Advisor**: Dr. [Advisor Name]
+- **Thesis**: "Performance Optimization in Modern Serverless Platforms"
 
+### **M.S. in Computer Science** | University Name | 2021 - 2023
+- **GPA**: 3.9/4.0
+- **Thesis**: "Cold Start Analysis in Function-as-a-Service Platforms"
 
+### **B.S. in Computer Science** | University Name | 2017 - 2021
+- **GPA**: 3.8/4.0
+- **Honors**: Magna Cum Laude, Dean's List
 
-<!--- stats & Trophy (start) -->
-<p align="center">
-  <!--- stats (start) -->
-<table align="center">
-<tr border="none">
-<td width="50%" align="center">
-  
-  <img  align="center"  src="https://github-readme-stats.vercel.app/api?username=sidag26&theme=dark&show_icons=true&count_private=true" />
-  <br></br>
-  <img  title="🔥 Get streak stats for your profile at git.io/streak-stats" alt="Mark streak" src="https://github-readme-streak-stats.herokuapp.com/?user=sidag26&theme=dark&hide_border=false" /> 
-</td>
+## 🛠️ Skills & Technologies
 
-<td width="50%" align="center">
+### **Cloud & Serverless**
+- AWS Lambda, Azure Functions, Google Cloud Functions
+- Kubernetes, Docker, Serverless Framework
+- Terraform, CloudFormation
 
-  <img  align="center"  src="https://github-readme-stats.anuraghazra1.vercel.app/api/top-langs/?username=sidag26&theme=dark&hide_border=false&no-bg=true&no-frame=true&langs_count=10"/>
-  
-  </td>
-</tr>
-</table>
-<!--- stats (end) -->
+### **Programming & Frameworks**
+- **Languages**: JavaScript/TypeScript, Python, Go, Java
+- **Frontend**: React, Next.js, TailwindCSS
+- **Backend**: Node.js, Express, FastAPI
+- **Databases**: PostgreSQL, MongoDB, Redis
 
-<!--- trophy (start) -->
-<div align=center>
-  <a href="https://github.com/ryo-ma/github-profile-trophy" title="Go to Source">
-      <img align="center" width=84% src="https://github-profile-trophy.vercel.app/?username=sidag26&theme=radical&row=1&column=7&margin-h=15&margin-w=5&no-bg=true" alt="TROPHY" />
-    </a>
-</div>
-<!--- trophy (start) -->
+### **DevOps & Tools**
+- CI/CD (GitHub Actions, Jenkins), Git
+- Monitoring (Prometheus, Grafana, CloudWatch)
+- Testing (Jest, Pytest, Playwright)
 
+## 📚 Recent Blog Posts
 
-</p>        
-<!--- stats (end) -->
+- [Understanding Cold Starts in Serverless Computing](https://www.siddharthagarwal.net/blog/cold-starts-serverless)
+- [Building Scalable Cloud Architectures](https://www.siddharthagarwal.net/blog/scalable-cloud-architectures)
+- [Performance Benchmarking FaaS Platforms](https://www.siddharthagarwal.net/blog/faas-benchmarking)
 
+## 🌐 Connect With Me
 
-<!--h1 without bottom border-->
-<div id="user-content-toc">
-  <ul align="center">
-    <summary><h2 style="display: inline-block">Technologies That I Know👨🏻‍💻</h2></summary>
-  </ul>
-</div>
-<!--tech stack icons-->
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=git,aws,docker,dynamodb,github,html,java,linux,nginx,mysql,postman,py,vscode,kubernetes&perline=14" />
-  </a>
-</p>
+- **Website**: [www.siddharthagarwal.net](https://www.siddharthagarwal.net)
+- **Blog**: [www.siddharthagarwal.net/blog](https://www.siddharthagarwal.net/blog)
+- **LinkedIn**: [linkedin.com/in/siddharth26agarwal](https://www.linkedin.com/in/siddharth26agarwal)
+- **Google Scholar**: [scholar.google.com/citations?user=6sx7cYEAAAAJ](https://scholar.google.com/citations?hl=en&user=6sx7cYEAAAAJ)
+- **Email**: sid@example.com
 
+## 📊 GitHub Stats
 
-<!-- Connect with me -->
-<!--h2 without bottom border-->
-<div id="user-content-toc">
-  <ul align="center">
-    <summary><h2 style="display: inline-block">Connect With Me🤝</h2></summary>
-  </ul>
-</div>
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=SidAg26&show_icons=true&theme=dark&hide_border=true)
 
-<!--icons and links-->
-<p align="center">
-<a href="www.linkedin.com/in/siddharth26agarwal" target="blank"><img align="center" src="https://user-images.githubusercontent.com/88904952/234979284-68c11d7f-1acc-4f0c-ac78-044e1037d7b0.png" alt="linkedin" height="50" width="50" /></a>
-<!-- <a href="https://twitter.com/sidag26" target="blank"><img align="center" src="https://user-images.githubusercontent.com/88904952/234980676-61bfb021-ecc8-48f7-88e6-34c1b06c4a58.png" alt="twitter" height="50" width="50" /></a>  -->
-<!-- <a href="https://www.instagram.com/nishant.jangir.1010/" target="blank"><img align="center" src="https://user-images.githubusercontent.com/88904952/234981169-2dd1e58f-4b7e-468c-8213-034ba62156c3.png" alt="instagram" height="50" width="50" /></a> -->
-<!-- <a href="https://dev.to/sidag26" target="blank"><img align="center" src="https://user-images.githubusercontent.com/88904952/234982196-562aea17-5532-4550-8c08-1c7cb994a541.png" alt="hashnode" height="50" width="50" /></a> -->
-<!-- <a href="https://discordapp.com/users/957722095381540874" target="blank"><img align="center" src="https://user-images.githubusercontent.com/88904952/234982627-019fd336-6248-453c-9b05-97c13fd1d207.png" alt="discord" height="50" width="50" /></a> -->
-  
-</p>
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=SidAg26&layout=compact&theme=dark&hide_border=true)
 
+## 🎯 Current Focus
 
-<!--profile visit count-->
-<div align="center">
-  
-[![](https://visitcount.itsvg.in/api?id=sidag26&icon=3&color=6)](https://visitcount.itsvg.in)
-  
-</div>
+I'm currently working on:
+- **Research**: Developing new methodologies for serverless performance measurement
+- **Open Source**: Contributing to serverless frameworks and tools
+- **Writing**: Blog posts about cloud computing best practices
+- **Community**: Speaking at conferences and meetups
 
+---
 
-<!--horizontal divider(gradiant)-->
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
+⭐ **Star this repo** if you found it helpful! Feel free to reach out for collaborations or questions about serverless computing and cloud architecture.

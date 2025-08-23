@@ -2,104 +2,102 @@
 
 # 🚀 Siddharth Agarwal
 
-### **PhD Researcher & Cloud Computing Specialist**
+### **PhD Researcher in Cloud Computing & Distributed Systems**
 
 [![Website](https://img.shields.io/badge/Website-www.siddharthagarwal.net-blue?style=for-the-badge&logo=vercel)](https://www.siddharthagarwal.net)
 [![Blog](https://img.shields.io/badge/Blog-Latest%20Posts-green?style=for-the-badge&logo=hashnode)](https://www.siddharthagarwal.net/blog)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/siddharth26agarwal)
+[![Google Scholar](https://img.shields.io/badge/Google_Scholar-Citations-orange?style=for-the-badge&logo=googlescholar)](https://scholar.google.com/citations?hl=en&user=6sx7cYEAAAAJ)
 
-> *"I research serverless platforms and developer tooling, focusing on performance optimization and developer productivity. I write about cloud computing, serverless architectures, and engineering practices."*
+> *"I research cloud computing and distributed systems, focusing on serverless computing optimization, cold start reduction, and intelligent autoscaling. My work spans from fundamental research to practical implementations in cloud platforms."*
 
 </div>
 
 ---
 
-## 🚀 Featured Projects
+## 🔬 Research Focus
 
 <table>
 <tr>
 <td width="50%">
 
-### 🔬 [Serverless Research Toolkit](https://github.com/SidAg26/serverless-research-toolkit)
-> Benchmarks and utilities for evaluating serverless platforms
+### ☁️ **Cloud Computing**
+> **Core Research Areas**
 
-**Features:**
-- 🚀 Cold start measurement & analysis
-- 📊 Performance benchmarking suite
-- 🔍 Platform comparison tools
-- 📈 Real-time metrics dashboard
+- 🚀 Serverless computing optimization
+- ❄️ Cold start frequency reduction
+- 📊 Intelligent autoscaling algorithms
+- 🧠 Reinforcement learning for cloud systems
+- 🔧 Dynamic function configuration
 
-**Tech Stack:**
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazonaws&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+**Applications:**
+- Serverless platforms (AWS Lambda, OpenFaaS)
+- Cloud resource management
+- Performance optimization
+- Distributed systems
 
 </td>
 <td width="50%">
 
-### 📊 [Cloud Performance Monitor](https://github.com/SidAg26/cloud-monitor)
-> Real-time monitoring and alerting for cloud infrastructure
+### 🤖 **Machine Learning & AI**
+> **Advanced Techniques**
 
-**Features:**
-- 🌐 Multi-cloud support (AWS, GCP, Azure)
-- 📈 Custom metrics & dashboards
-- ⚡ Automated scaling triggers
-- 🔔 Smart alerting system
+- 🧠 Deep recurrent-reinforcement learning
+- 🔄 Off-policy reinforcement learning
+- 📊 Ensemble learning methods
+- ⚡ Dynamic memory configuration
+- 🎯 Input-aware function scheduling
 
-**Tech Stack:**
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazonaws&logoColor=white)
-![GCP](https://img.shields.io/badge/GCP-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white)
+**Specializations:**
+- Cloud performance optimization
+- Resource allocation
+- Intelligent automation
+- Predictive scaling
+
+</td>
+</tr>
+</table>
+
+## 🎓 Education
+
+<table>
+<tr>
+<td width="50%">
+
+### 🎯 **PhD in Engineering & IT**
+> **University of Melbourne** | 2021 - Present
+
+**Research Focus:** Cloud Computing, Distributed Systems  
+**Thesis:** Cloud Computing Optimization and Serverless Computing
+
+**Key Achievements:**
+- 🏆 Melbourne Research Scholarship recipient
+- 📚 Multiple publications in top-tier conferences
+- 🌟 Best Paper Award (Runner-Up) at CCGrid 2021
+
+</td>
+<td width="50%">
+
+### 🎓 **Master of Science (Computer Science)**
+> **University of Melbourne** | 2021
+
+**GPA:** 89.85 WAM (H1 Grade)  
+**Achievement:** Dean's Honour's List Award
+
+**Focus:** Advanced Computer Science and Cloud Computing
 
 </td>
 </tr>
 <tr>
 <td colspan="2">
 
-### 🌐 [Serverless Blog Platform](https://github.com/SidAg26/serverless-blog)
-> A modern, serverless blog built with Next.js and deployed on Vercel
+### 🏆 **Bachelor of Technology (Honours)**
+> **Jaypee Institute of Information Technology** | 2017
 
-**Features:**
-- ✍️ Rich Markdown support with MDX
-- 🌙 Dark/Light mode toggle
-- 📱 Fully responsive design
-- ⚡ Serverless deployment
-- 🔍 SEO optimized
+**Major:** Computer Science and Engineering  
+**GPA:** 8.5/10
 
-**Tech Stack:**
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
-
-</td>
-</tr>
-</table>
-
-## 🔬 Research & Publications
-
-<table>
-<tr>
-<td width="50%">
-
-### 📄 **Measuring and Mitigating Cold Starts in Serverless Platforms** (2025)
-> **Conference:** Proceedings of Cloud Systems (CLOUD)
-
-**DOI:** [10.1234/cloud.2025.123](https://doi.org/10.1234/cloud.2025.123)
-
-**Abstract:** We present a methodology for measuring cold starts across cloud FaaS platforms and evaluate mitigation strategies.
-
-</td>
-<td width="50%">
-
-### 📊 **Performance Analysis of FaaS Platforms** (2024)
-> **Journal:** Cloud Computing Research
-
-**Focus:** Comparative study of AWS Lambda, Azure Functions, and Google Cloud Functions
-
-**Impact:** Cited by 15+ researchers in the field
+**Honors:** Computer Science and Engineering with Honours
 
 </td>
 </tr>
@@ -111,71 +109,104 @@
 <tr>
 <td width="50%">
 
-### 🏢 **Cloud Engineer** | Company A | 2020 - 2021
-> **Role:** Senior Cloud Infrastructure Engineer
+### 🔬 **PhD Researcher** | University of Melbourne | 2021 - Present
+> **Role:** Doctoral Candidate in Cloud Computing
 
-**Key Achievements:**
-- 🚀 Built and optimized serverless workloads for high-traffic applications
-- ⚡ Implemented CI/CD pipelines reducing deployment time by **60%**
-- 🏗️ Designed scalable cloud architectures using AWS services
-- 📊 Improved system performance by **40%** through optimization
+**Current Research:**
+- 🚀 Serverless computing optimization
+- ❄️ Cold start frequency reduction using RL
+- 📊 Intelligent autoscaling algorithms
+- 🧠 Deep learning for cloud resource management
+- 🔧 Dynamic function configuration
 
-**Technologies:** AWS Lambda, CloudFormation, CI/CD, Serverless
+**Technologies:** Python, Java, AWS, OpenStack, Kubernetes, OpenFaaS
 
 </td>
 <td width="50%">
 
-### 🔬 **Research Assistant** | University Name | 2021 - Present
-> **Role:** PhD Research Assistant in Cloud Computing
+### 🏢 **Associate System Engineer** | IBM India Pvt. Ltd. | 2018 - 2019
+> **Role:** CMS Application Development
 
-**Current Research:**
-- 📈 Conducting research on serverless computing performance
-- 🛠️ Developing tools for measuring and optimizing FaaS platforms
-- 🤝 Collaborating with industry partners on cloud optimization projects
-- 📚 Publishing in top-tier conferences and journals
+**Key Achievements:**
+- 🛠️ Development and management of Archer-CMS applications
+- 🔍 Troubleshooting Archer-CMS applications and SQL databases
+- 👥 Supervised internal team meetings and client presentations
+- 🎓 Trained new resources and conducted knowledge transfer
+- 📚 Created application documentation and led client meetings
 
-**Focus Areas:** Performance, Optimization, Tooling
+**Technologies:** Archer-CMS, SQL, Java, Application Automation
 
 </td>
 </tr>
 </table>
 
-## 🎓 Education
+## 📚 Publications & Research
 
 <table>
 <tr>
-<td width="33%">
+<td width="50%">
 
-### 🎯 **PhD in Computer Science**
-> **University Name** | 2023 - Present
+### 📄 **Published Papers**
+> **2021 - 2024**
 
-**Research Focus:** Serverless Computing, Performance Optimization  
-**Advisor:** Dr. [Advisor Name]  
-**Thesis:** "Performance Optimization in Modern Serverless Platforms"
+- **[A Deep Recurrent-Reinforcement Learning Method for Intelligent Autoscaling of Serverless Functions](https://doi.org/10.1109/TSC.2024.3387661)** (IEEE TSC 2024)
+- **[A Reinforcement Learning Approach to Reduce Serverless Function Cold Start Frequency](https://ieeexplore.ieee.org/abstract/document/9499423)** (CCGrid 2021) - **Best Paper Award (Runner-Up)**
+- **[On-demand Cold Start Frequency Reduction with Off-Policy Reinforcement Learning in Serverless Computing](https://link.springer.com/chapter/10.1007/978-981-96-0451-7_1)** (ICCIDA 2024)
+- **[Input-Based Ensemble-Learning Method for Dynamic Memory Configuration of Serverless Computing Functions](https://ieeexplore.ieee.org/abstract/document/10971755)** (UCC 2024)
 
-**Current Status:** In Progress (Year 2)
-
-</td>
-<td width="33%">
-
-### 🎓 **M.S. in Computer Science**
-> **University Name** | 2021 - 2023
-
-**GPA:** 3.9/4.0  
-**Thesis:** "Cold Start Analysis in Function-as-a-Service Platforms"
-
-**Achievements:** Outstanding Graduate Student Award
+**Research Impact:**
+- 🌟 Best Paper Award recognition
+- 📊 Published in top-tier IEEE journals and conferences
+- 💡 Novel contributions to serverless computing
 
 </td>
-<td width="33%">
+<td width="50%">
 
-### 🏆 **B.S. in Computer Science**
-> **University Name** | 2017 - 2021
+### 🔬 **Research Projects**
+> **Current & Completed**
 
-**GPA:** 3.8/4.0  
-**Honors:** Magna Cum Laude, Dean's List
+- **Serverless Optimization Research** (2021-Present)
+- **Cold Start Reduction using RL** (2021-2024)
+- **Intelligent Autoscaling Algorithms** (2022-2024)
+- **Dynamic Memory Configuration** (2023-2024)
+- **Input-aware Function Scheduling** (2023-Present)
 
-**Activities:** Computer Science Club President
+**Collaborations:**
+- 🏢 Telstra Corporation Ltd. (Vocational Placement)
+- 🎓 University of Melbourne Cloud Computing Lab
+- 🌍 International research community
+
+</td>
+</tr>
+</table>
+
+## 🎓 Teaching Experience
+
+<table>
+<tr>
+<td width="50%">
+
+### 👨‍🏫 **Head Tutor** | University of Melbourne | 2023 - Present
+- **Distributed Systems (COMP90015)**
+- **Distributed Algorithms (COMP90020)**
+
+**Responsibilities:**
+- 📚 Course material development and delivery
+- 🎯 Leading tutorial sessions
+- 📊 Student assessment and feedback
+- 🤝 Academic support and mentoring
+
+</td>
+<td width="50%">
+
+### 👨‍🏫 **Sessional Tutor** | University of Melbourne | 2023 - 2024
+- **Cluster and Cloud Computing (COMP90024)**
+- **Advanced Database Systems (COMP90050)**
+- **Statistical Machine Learning (COMP90051)**
+- **Design of Algorithms (COMP20007)**
+- **Database Systems (INFO20003)**
+
+**Total Teaching Experience:** 2+ years at postgraduate levels
 
 </td>
 </tr>
@@ -189,41 +220,97 @@
 
 ### ☁️ **Cloud & Serverless**
 ![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazonaws&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure-0089D6?style=flat-square&logo=microsoftazure&logoColor=white)
-![GCP](https://img.shields.io/badge/GCP-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
+![OpenStack](https://img.shields.io/badge/OpenStack-ED1944?style=flat-square&logo=openstack&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 
-**Infrastructure:**
-- 🐳 Docker & Kubernetes
-- 🚀 Serverless Framework
-- 🏗️ Terraform & CloudFormation
+**Platforms:**
+- 🚀 OpenFaaS & Kubeless
+- ☁️ Melbourne Research Cloud
+- 🔧 Serverless computing platforms
+- 🐳 Container orchestration
 
 </td>
 <td width="33%">
 
-### 💻 **Programming & Frameworks**
+### 💻 **Programming & Development**
 **Languages:**
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=java&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![Go](https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
-**Frameworks:**
-- ⚛️ React & Next.js
-- 🎨 TailwindCSS
-- 🚀 Node.js & Express
+**Tools:**
+- 🛠️ Eclipse & VS Code
+- 🔧 Ansible (DevOps)
+- 📊 Development frameworks
+- 🎯 Vibe-Coding
 
 </td>
 <td width="33%">
 
-### 🔧 **DevOps & Tools**
-**CI/CD:**
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
-![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)
+### 🔬 **Research & ML**
+**Machine Learning:**
+- 🧠 Reinforcement Learning
+- 🔄 Deep Recurrent Networks
+- 📊 Ensemble Learning
+- 🎯 Off-policy RL
 
-**Monitoring:**
-- 📊 Prometheus & Grafana
-- ☁️ CloudWatch
-- 🧪 Jest & Pytest
+**Areas:**
+- Cloud performance optimization
+- Resource allocation
+- Predictive scaling
+- System automation
+
+</td>
+</tr>
+</table>
+
+## 🌟 Awards & Recognition
+
+<table>
+<tr>
+<td width="50%">
+
+### 🏆 **Academic Excellence**
+- **Melbourne Research Scholarship** for PhD program (2021-Present)
+- **Dean's Honour's List Award** for Master of Science (2021)
+- **Best Paper Award (Runner-Up)** at CCGrid 2021
+
+</td>
+<td width="50%">
+
+### 🎯 **Research Recognition**
+- **IEEE Student Member**
+- **Reviewer** for multiple IEEE journals
+- **Research Grant Recipient** (Melbourne Research Scholarship)
+
+</td>
+</tr>
+</table>
+
+## 🔍 Research Activities
+
+<table>
+<tr>
+<td width="50%">
+
+### 📚 **Reviewer Experience**
+> **IEEE Journals & Conferences**
+
+- IEEE Transaction on Services Computing
+- IEEE Transaction on Mobile Computing
+- IEEE Transactions on Network and Service Management
+- IEEE Transactions on Computers
+- Future Generation Computer Systems
+- Software: Practice and Experience
+- Journal of Network and Computer Applications
+
+</td>
+<td width="50%">
+
+### 🌍 **Professional Memberships**
+- **IEEE Student Member**
+- **Cloud Computing Research Community**
+- **Distributed Systems Research Group**
 
 </td>
 </tr>
@@ -268,10 +355,9 @@
 <div align="center">
 
 [![Website](https://img.shields.io/badge/Website-www.siddharthagarwal.net-blue?style=for-the-badge&logo=vercel)](https://www.siddharthagarwal.net)
-[![Blog](https://img.shields.io/badge/Blog-Latest%20Posts-green?style=for-the-badge&logo=hashnode)](https://www.siddharthagarwal.net/blog)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/siddharth26agarwal)
 [![Google Scholar](https://img.shields.io/badge/Google_Scholar-Citations-orange?style=for-the-badge&logo=googlescholar)](https://scholar.google.com/citations?hl=en&user=6sx7cYEAAAAJ)
-[![Email](https://img.shields.io/badge/Email-siddhartha@student.unimelb.edu.au-red?style=for-the-badge&logo=gmail)](mailto:siddhartha@student.unimelb.edu.au)
+[![Email](https://img.shields.io/badge/Email-agasa@unimelb.edu.au-red?style=for-the-badge&logo=gmail)](mailto:agasa@unimelb.edu.au)
 
 </div>
 
@@ -287,48 +373,52 @@
 
 </div>
 
-## 🎯 Current Focus
+## 🎯 Current Research Areas
 
 <table>
 <tr>
 <td width="25%">
 
-### 🔬 **Research**
-> **Serverless Performance**
+### ☁️ **Cloud Computing**
+> **Serverless Optimization**
 
-- 📊 New methodologies for measurement
-- ⚡ Cold start optimization
-- 🏗️ Platform benchmarking tools
-
-</td>
-<td width="25%">
-
-### 🚀 **Open Source**
-> **Contributing & Building**
-
-- 🛠️ Serverless frameworks
-- 📦 Performance tools
-- 🔧 Developer utilities
+- 🚀 Cold start reduction
+- 📊 Intelligent autoscaling
+- 🔧 Dynamic configuration
+- 🎯 Performance optimization
 
 </td>
 <td width="25%">
 
-### ✍️ **Writing**
-> **Knowledge Sharing**
+### 🤖 **Machine Learning**
+> **Reinforcement Learning**
 
-- 📚 Cloud computing best practices
-- 🎯 Serverless architecture guides
-- 📊 Performance analysis posts
+- 🧠 Deep recurrent networks
+- 🔄 Off-policy algorithms
+- 📊 Ensemble methods
+- ⚡ Real-time optimization
 
 </td>
 <td width="25%">
 
-### 🌟 **Community**
-> **Speaking & Networking**
+### 🏗️ **Distributed Systems**
+> **System Architecture**
 
-- 🎤 Conference presentations
-- 🤝 Meetup organization
-- 📖 Mentoring students
+- 🔄 Distributed algorithms
+- 📊 Resource management
+- 🚀 Scalable systems
+- 🔧 System optimization
+
+</td>
+<td width="25%">
+
+### 🌟 **Open Source**
+> **Community Contribution**
+
+- 🛠️ Cloud computing tools
+- 📦 Serverless frameworks
+- 🔧 Research utilities
+- 📚 Educational resources
 
 </td>
 </tr>
@@ -338,7 +428,7 @@
 
 <div align="center">
 
-⭐ **Star this repo** if you found it helpful! Feel free to reach out for collaborations or questions about serverless computing and cloud architecture.
+⭐ **Star this repo** if you found it helpful! Feel free to reach out for collaborations or questions about cloud computing and distributed systems research.
 
 [![GitHub Stars](https://img.shields.io/github/stars/SidAg26/sidag26?style=social)](https://github.com/SidAg26/sidag26)
 

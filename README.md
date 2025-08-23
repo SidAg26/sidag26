@@ -340,6 +340,6 @@
 
 ⭐ **Star this repo** if you found it helpful! Feel free to reach out for collaborations or questions about serverless computing and cloud architecture.
 
-[![GitHub Stars](https://img.shields.io/github/stars/SidAg26/serverlesswithsid?style=social)](https://github.com/SidAg26/serverlesswithsid)
+[![GitHub Stars](https://img.shields.io/github/stars/SidAg26/sidag26?style=social)](https://github.com/SidAg26/sidag26)
 
 </div>

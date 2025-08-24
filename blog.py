@@ -67,8 +67,8 @@ def generate_blog_with_gemini(prompt: str):
         return None
 
     try:
-        # Use genai.GenerativeModel and generate_content for Gemini
-        model = genai.GenerativeModel('gemini-pro') # Using 'gemini-pro' for text generation
+        # Using 'gemini-2.5-flash-preview-05-20' for text generation as 'gemini-pro' might not be available for generateContent in v1beta
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
             prompt,
             generation_config=GenerationConfig( # Use imported GenerationConfig

@@ -78,10 +78,22 @@ def generate_blog_with_gemini(prompt: str):
         )
         
         # Access the generated text directly from the response object
-        if response and response.text:
+        # Check if any parts are present before accessing .text
+        if response and response.parts: # Check if response.parts exist
             return response.text
         else:
-            print("Gemini generated no readable text content.")
+            # If no parts, check for finish_reason for more specific feedback
+            finish_reason = None
+            if hasattr(response, 'candidates') and response.candidates:
+                # Assuming the first candidate for finish_reason
+                first_candidate = response.candidates[0]
+                if hasattr(first_candidate, 'finish_reason'):
+                    finish_reason = first_candidate.finish_reason
+
+            if finish_reason == 2:
+                print("Gemini generated no readable text content. Response was likely blocked due to safety concerns or content policy.")
+            else:
+                print(f"Gemini generated no readable text content. Finish reason: {finish_reason}.")
             return None
     except Exception as e:
         print(f"Gemini failed: {e}")

@@ -2,6 +2,7 @@ import os
 import datetime
 import re
 import requests
+import json
 from pathlib import Path
 
 # ===== AI imports =====
@@ -91,32 +92,62 @@ def generate_blog_with_gemini(prompt: str):
         print(f"Gemini failed: {e}")
         return None
 
-def generate_blog_html(topic):
-    """Try OpenAI first, fallback to Gemini."""
+def generate_structured_content(topic):
+    """Generate structured content that's easier to format"""
     prompt = f"""
-Write a detailed technical blog post about: {topic}
+Generate a blog post about: {topic}
+
+Return ONLY a JSON object with this structure:
+{{
+    "title": "Blog Title",
+    "description": "Short description of the blog post",
+    "sections": [
+        {{
+            "heading": "Introduction",
+            "content": "Introduction content with practical examples and insights",
+            "code_examples": []
+        }},
+        {{
+            "heading": "Main Concepts",
+            "content": "Detailed explanation of main concepts with real-world applications",
+            "code_examples": ["example code 1", "example code 2"]
+        }},
+        {{
+            "heading": "Best Practices",
+            "content": "Best practices and optimization strategies",
+            "code_examples": ["best practice code example"]
+        }},
+        {{
+            "heading": "Conclusion",
+            "content": "Summary and future considerations",
+            "code_examples": []
+        }}
+    ],
+    "tags": ["tag1", "tag2", "tag3"],
+    "read_time": 5
+}}
 
 Requirements:
-- Use proper HTML structure with <h2>, <h3>, <p>, <ul>, <ol>, <code>, <pre>
-- Include practical examples and code snippets
-- Make it informative and engaging
-- Target length: 800-1500 words
 - Focus on cloud computing, serverless, or distributed systems
-- Do NOT include <h1> tags (title is handled separately)
-- Do NOT include <html>, <head>, or <body> tags
-
-Format the content with proper HTML tags but keep it as content only.
+- Make content informative and engaging
+- Include practical examples where relevant
+- Target total content: 800-1500 words
+- Return ONLY valid JSON, no other text
+- Use technical but accessible language
 """
+    
     blog_content = None
 
     # Try OpenAI
     if client:
         try:
-            print("Attempting to generate blog with OpenAI...")
+            print("Attempting to generate structured content with OpenAI...")
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[{"role": "system", "content": "You are a technical blog writer."},
-                          {"role": "user", "content": prompt}],
+                messages=[
+                    {"role": "system", "content": "You are a technical blog writer. Always return valid JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
                 temperature=0.7
             )
             blog_content = response.choices[0].message.content
@@ -127,7 +158,7 @@ Format the content with proper HTML tags but keep it as content only.
 
     # Fallback to Gemini
     if not blog_content and GEMINI_API_KEY and genai:
-        print("Attempting to generate blog with Gemini...")
+        print("Attempting to generate structured content with Gemini...")
         blog_content = generate_blog_with_gemini(prompt)
         if blog_content:
             print("Gemini generation successful.")
@@ -135,8 +166,38 @@ Format the content with proper HTML tags but keep it as content only.
     if not blog_content:
         raise RuntimeError("No AI service available for blog generation.")
     
-    # Format the content using your template
-    return format_blog_with_template(topic, blog_content)
+    # Parse JSON and convert to HTML
+    try:
+        structured_data = json.loads(blog_content)
+        return build_html_from_structure(structured_data)
+    except json.JSONDecodeError as e:
+        print(f"Failed to parse JSON: {e}")
+        print("Raw content:", blog_content)
+        # Fallback: treat as plain text
+        return f"<h2>Introduction</h2><p>{blog_content}</p>"
+
+def build_html_from_structure(structured_content):
+    """Build HTML from structured content"""
+    html_parts = []
+    
+    for section in structured_content.get('sections', []):
+        # Create heading with ID for TOC
+        heading_id = section['heading'].lower().replace(' ', '-').replace('&', 'and')
+        html_parts.append(f'<h2 id="{heading_id}">{section["heading"]}</h2>')
+        
+        # Add content
+        html_parts.append(f'<p>{section["content"]}</p>')
+        
+        # Add code examples if any
+        if section.get('code_examples'):
+            for code in section['code_examples']:
+                html_parts.append(f'<pre><code>{code}</code></pre>')
+    
+    return '\n'.join(html_parts)
+
+def generate_blog_html(topic):
+    """Generate blog content using structured approach"""
+    return generate_structured_content(topic)
 
 def format_blog_with_template(topic, content_html):
     """Format the AI-generated content using TEMPLATE.html"""
@@ -403,7 +464,7 @@ def update_index(title, filename):
         <span class="text-gray-400 text-sm">{date_str}</span>
     </div>
     <h3 class="text-xl font-bold text-primary mb-3">
-        �� {title}
+        🚀 {title}
     </h3>
     <p class="text-gray-300 mb-4">
         Brief intro/summary of the article. (Update after approval if needed)

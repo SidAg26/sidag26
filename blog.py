@@ -97,7 +97,7 @@ Return ONLY a valid JSON object with this structure:
         }},
         {{
             "heading": "Best Practices",
-            "content": "1 paragraph with implementation guidance",
+            "content": "1-2 paragraph with implementation guidance",
             "code_examples": ["// Best practice example"]
         }},
         {{
@@ -269,7 +269,8 @@ Remember: Return ONLY the JSON object, nothing else.
     # Parse JSON and convert to HTML
     try:
         structured_data = json.loads(blog_content)
-        return build_html_from_structure(structured_data)
+        html_content, title = build_html_from_structure(structured_data)
+        return html_content, title
     except json.JSONDecodeError as e:
         print(f"❌ Failed to parse JSON: {e}")
         print("📄 Raw content:", blog_content)
@@ -283,19 +284,20 @@ Remember: Return ONLY the JSON object, nothing else.
                 fixed_json = fix_truncated_json(extracted_json)
                 structured_data = json.loads(fixed_json)
                 print("✅ Successfully parsed extracted and fixed JSON")
-                return build_html_from_structure(structured_data)
+                html_content, title = build_html_from_structure(structured_data)
+                return html_content, title
             except json.JSONDecodeError as json_error:
                 print(f"❌ Failed to parse extracted JSON: {json_error}")
         
         # Try to build content from partial JSON
         print("🔄 Attempting to build content from partial JSON...")
-        partial_content = build_from_partial_json(blog_content, topic)
+        partial_content, partial_title = build_from_partial_json(blog_content, topic)
         if partial_content:
-            return partial_content
+            return partial_content, partial_title
         
         # Final fallback: treat as plain text
         print("⚠️ Using final fallback: plain text conversion")
-        return f"<h2>Introduction</h2><p>Error: Could not parse structured content. Please check the AI generation.</p>"
+        return f"<h2>Introduction</h2><p>Error: Could not parse structured content. Please check the AI generation.</p>", f"Understanding {topic}"
 
 def fix_truncated_json(json_string):
     """Attempt to fix common JSON truncation issues"""
@@ -382,7 +384,7 @@ def build_from_partial_json(content, topic):
     except Exception as e:
         print(f"❌ Error building from partial JSON: {e}")
     
-    return None
+    return None, f"Understanding {topic}"
 
 def build_html_from_structure(structured_content):
     """Build HTML from structured content"""
@@ -391,13 +393,16 @@ def build_html_from_structure(structured_content):
     # Validate required fields
     if not isinstance(structured_content, dict):
         print("❌ Error: structured_content is not a dictionary")
-        return "<h2>Error</h2><p>Invalid content structure</p>"
+        return "<h2>Error</h2><p>Invalid content structure</p>", "Error"
+    
+    # Get the actual title from structured content
+    actual_title = structured_content.get('title', 'Untitled Blog Post')
     
     # Get sections, default to empty list if missing
     sections = structured_content.get('sections', [])
     if not sections:
         print("❌ Warning: No sections found in structured content")
-        return "<h2>Introduction</h2><p>Content structure is incomplete</p>"
+        return "<h2>Introduction</h2><p>Content structure is incomplete</p>", actual_title
     
     for i, section in enumerate(sections):
         if not isinstance(section, dict):
@@ -437,9 +442,9 @@ def build_html_from_structure(structured_content):
                         html_parts.append(f'<pre><code>{clean_code}</code></pre>')
     
     if not html_parts:
-        return "<h2>Introduction</h2><p>No content could be generated from the structured data.</p>"
+        return "<h2>Introduction</h2><p>No content could be generated from the structured data.</p>", actual_title
     
-    return '\n'.join(html_parts)
+    return '\n'.join(html_parts), actual_title
 
 def generate_test_blog(topic):
     """Generate a test blog post without requiring API keys"""
@@ -481,27 +486,30 @@ def generate_test_blog(topic):
     }
     
     print("✅ Test blog content generated successfully")
-    return build_html_from_structure(test_content)
+    html_content, title = build_html_from_structure(test_content)
+    return html_content, title
 
 def generate_blog_html(topic):
     """Generate blog content using structured approach"""
     # Check if we have any API keys configured
     if not OPENAI_API_KEY and not GEMINI_API_KEY:
         print("⚠️ No API keys configured. Running in test mode...")
-        return generate_test_blog(topic)
+        html_content, title = generate_test_blog(topic)
+        return html_content, title
     
     # Generate structured content
-    structured_content = generate_structured_content(topic)
+    structured_content, actual_title = generate_structured_content(topic)
     
     # Format it using the template
     if structured_content:
         print("🔄 Formatting content with template...")
-        return format_blog_with_template(topic, structured_content)
+        formatted_content = format_blog_with_template(topic, structured_content, actual_title)
+        return formatted_content, actual_title
     else:
         print("❌ No structured content generated")
-        return None
+        return None, None
 
-def format_blog_with_template(topic, content_html):
+def format_blog_with_template(topic, content_html, title):
     """Format the AI-generated content using TEMPLATE.html"""
     
     # Read the template file
@@ -513,11 +521,7 @@ def format_blog_with_template(topic, content_html):
     with open(template_path, 'r', encoding='utf-8') as f:
         template = f.read()
     
-    # Extract key information from the AI content
-    # Extract title (look for first <h2> or use topic)
-    title_match = re.search(r'<h2[^>]*>(.*?)</h2>', content_html, re.IGNORECASE)
-    title = title_match.group(1).strip() if title_match else topic
-    
+    # Use the passed title instead of extracting from content
     # Extract description (first paragraph)
     desc_match = re.search(r'<p[^>]*>(.*?)</p>', content_html, re.IGNORECASE)
     description = desc_match.group(1).strip() if desc_match else f"Comprehensive guide about {topic}"
@@ -539,7 +543,8 @@ def format_blog_with_template(topic, content_html):
     toc = generate_table_of_contents(content_html)
     
     # Replace template placeholders (using double curly braces as in your template)
-    formatted_content = template.replace('{{TITLE}}', title)
+    formatted_content = template
+    formatted_content = formatted_content.replace('{{TITLE}}', title)
     formatted_content = formatted_content.replace('{{DESCRIPTION}}', description)
     formatted_content = formatted_content.replace('{{CONTENT}}', content_html)
     formatted_content = formatted_content.replace('{{TAGS}}', tags)
@@ -943,13 +948,15 @@ if __name__ == "__main__":
     try:
         # 1. Generate draft HTML
         print("🔄 Step 1: Generating structured content...")
-        blog_html = generate_blog_html(topic)
+        result = generate_blog_html(topic)
         
-        if not blog_html:
+        if not result or result[0] is None:
             print("❌ Error: No blog content generated")
             exit(1)
         
+        blog_html, actual_title = result
         print(f"✅ Content generated successfully. Length: {len(blog_html)} characters")
+        print(f"📝 Blog title: {actual_title}")
         print("📄 Preview of generated content:")
         print("-" * 50)
         print(blog_html[:200] + "..." if len(blog_html) > 200 else blog_html)
@@ -965,7 +972,7 @@ if __name__ == "__main__":
         # 3. Save draft locally
         print("\n🔄 Step 3: Saving draft locally...")
         if blog_html:
-            draft_file = save_blog_file(topic, blog_html)
+            draft_file = save_blog_file(actual_title, blog_html)
             print(f"✅ Draft saved to: {draft_file}")
             
             # 4. Update topics.md
@@ -975,7 +982,7 @@ if __name__ == "__main__":
             
             # 5. Update blog/index.html
             print("\n🔄 Step 5: Updating blog index...")
-            update_index(topic, draft_file)
+            update_index(actual_title, draft_file)
             print("✅ Blog index updated")
             
             # 6. Verify placeholder is preserved

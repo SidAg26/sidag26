@@ -156,7 +156,7 @@
                 <a href="https://www.siddharthagarwal.net" class="social-badge hover:no-underline">
                     🌐 Website
                 </a>
-                <a href="https://www.siddharthagarwal.net/blog" class="social-badge hover:no-underline">
+                <a href="./blog/index.html" class="social-badge hover:no-underline">
                     📚 Blog
                 </a>
                 <a href="https://www.linkedin.com/in/siddharth26agarwal" class="social-badge hover:no-underline">
@@ -468,26 +468,31 @@
             <h2 class="text-4xl font-bold text-white text-center mb-16">📚 Recent Blog Posts</h2>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
-                    <h3 class="text-lg font-bold text-primary mb-2">🚀 Understanding Cold Starts in Serverless Computing</h3>
-                    <p class="text-gray-300 mb-2"><strong>Published:</strong> January 2025</p>
+                    <h3 class="text-lg font-bold text-primary mb-2">🚀 Mastering AWS Lambda Cold Starts: Strategies for Peak Serverless Performance</h3>
+                    <p class="text-gray-300 mb-2"><strong>Published:</strong> August 24, 2025</p>
                     <p class="text-gray-300 mb-2"><strong>Topics:</strong> Performance, Optimization, AWS Lambda</p>
-                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> 8 min read</p>
-                    <a href="https://www.siddharthagarwal.net/blog/cold-starts-serverless" class="text-primary hover:underline">Read More →</a>
+                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> 13 min read</p>
+                    <a href="./blog/2025-08-24-mastering-aws-lambda-cold-starts-strategies-for-peak-serverless-performance.html" class="text-primary hover:underline">Read More →</a>
                 </div>
                 <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
-                    <h3 class="text-lg font-bold text-primary mb-2">🏗️ Building Scalable Cloud Architectures</h3>
-                    <p class="text-gray-300 mb-2"><strong>Published:</strong> December 2024</p>
+                    <h3 class="text-lg font-bold text-primary mb-2">🏗️ Serverless Function Scaling Explained</h3>
+                    <p class="text-gray-300 mb-2"><strong>Published:</strong> August 24, 2025</p>
                     <p class="text-gray-300 mb-2"><strong>Topics:</strong> Architecture, Scalability, Best Practices</p>
-                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> 12 min read</p>
-                    <a href="https://www.siddharthagarwal.net/blog/scalable-cloud-architectures" class="text-primary hover:underline">Read More →</a>
+                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> 5 min read</p>
+                    <a href="./blog/2025-08-24-serverless-function-scaling-explained.html" class="text-primary hover:underline">Read More →</a>
                 </div>
                 <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
-                    <h3 class="text-lg font-bold text-primary mb-2">📊 Performance Benchmarking FaaS Platforms</h3>
-                    <p class="text-gray-300 mb-2"><strong>Published:</strong> November 2024</p>
-                    <p class="text-gray-300 mb-2"><strong>Topics:</strong> Benchmarking, FaaS, Performance Analysis</p>
-                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> 10 min read</p>
-                    <a href="https://www.siddharthagarwal.net/blog/faas-benchmarking" class="text-primary hover:underline">Read More →</a>
+                    <h3 class="text-lg font-bold text-primary mb-2">🏗️ More on Serverless Computing</h3>
+                    <p class="text-gray-300 mb-2"><strong>Published:</strong> Coming Soon</p>
+                    <p class="text-gray-300 mb-2"><strong>Topics:</strong> Serverless, Cloud Computing, Research</p>
+                    <p class="text-gray-300 mb-4"><strong>Read Time:</strong> Coming Soon</p>
+                    <a href="./blog/index.html" class="text-primary hover:underline">Read More →</a>
                 </div>
+            </div>
+            <div class="text-center mt-8">
+                <a href="./blog/index.html" class="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors">
+                    📚 View All Blog Posts
+                </a>
             </div>
         </div>
     </section>
@@ -549,7 +554,7 @@
                 <a href="https://www.siddharthagarwal.net" class="social-badge hover:no-underline">
                     🌐 Website
                 </a>
-                <a href="https://www.siddharthagarwal.net/blog" class="social-badge hover:no-underline">
+                <a href="./blog/index.html" class="social-badge hover:no-underline">
                     📚 Blog
                 </a>
                 <a href="https://www.linkedin.com/in/siddharth26agarwal" class="social-badge hover:no-underline">
@@ -566,6 +571,36 @@
         </div>
     </section>
 
+    <!-- Newsletter Signup -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="bg-gray-900 rounded-xl p-8 border border-gray-800">
+                <h2 class="text-3xl font-bold text-white mb-4">📧 Stay Updated with My Research</h2>
+                <p class="text-gray-300 mb-6 text-lg">
+                    Get notified when I publish new blog posts about cloud computing, serverless optimization, and distributed systems research.
+                </p>
+                <form id="newsletter-form" class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                    <input 
+                        type="email" 
+                        id="newsletter-email" 
+                        placeholder="Enter your email" 
+                        required
+                        class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-primary flex-1"
+                    >
+                    <button 
+                        type="submit" 
+                        id="subscribe-btn"
+                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                        <span id="btn-text">Subscribe</span>
+                        <span id="btn-loading" class="hidden">⏳</span>
+                    </button>
+                </form>
+                <div id="subscription-message" class="mt-4 hidden"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="bg-gray-900 border-t border-gray-800 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -573,6 +608,9 @@
         </div>
     </footer>
 
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <!-- Theme Toggle Script -->
     <script>
         const themeToggle = document.getElementById('theme-toggle');
@@ -608,6 +646,73 @@
                     });
                 }
             });
+        });
+        
+        // Newsletter subscription form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize EmailJS
+            emailjs.init("YOUR_PUBLIC_KEY"); // You'll replace this with your actual key
+            
+            const newsletterForm = document.getElementById('newsletter-form');
+            const emailInput = document.getElementById('newsletter-email');
+            const subscribeBtn = document.getElementById('subscribe-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoading = document.getElementById('btn-loading');
+            const subscriptionMessage = document.getElementById('subscription-message');
+            
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = emailInput.value.trim();
+                    if (!email) return;
+                    
+                    // Show loading state
+                    subscribeBtn.disabled = true;
+                    btnText.classList.add('hidden');
+                    btnLoading.classList.remove('hidden');
+                    
+                    // EmailJS template parameters
+                    const templateParams = {
+                        to_email: 'agasa@unimelb.edu.au', // Your email address
+                        from_email: email,
+                        message: `New newsletter subscription from: ${email}`,
+                        subject: 'New Blog Newsletter Subscription'
+                    };
+                    
+                    // Send email using EmailJS
+                    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                        .then(function(response) {
+                            console.log('SUCCESS!', response.status, response.text);
+                            showMessage('✅ Successfully subscribed! You\'ll receive updates about new blog posts.', 'success');
+                            emailInput.value = '';
+                        }, function(error) {
+                            console.log('FAILED...', error);
+                            showMessage('❌ Something went wrong. Please try again or contact me directly.', 'error');
+                        })
+                        .finally(function() {
+                            // Reset button state
+                            subscribeBtn.disabled = false;
+                            btnText.classList.remove('hidden');
+                            btnLoading.classList.add('hidden');
+                        });
+                });
+            }
+            
+            function showMessage(message, type) {
+                subscriptionMessage.textContent = message;
+                subscriptionMessage.className = `mt-4 p-3 rounded-lg ${
+                    type === 'success' 
+                        ? 'bg-green-900/20 border border-green-700 text-green-300' 
+                        : 'bg-red-700 text-red-300'
+                }`;
+                subscriptionMessage.classList.remove('hidden');
+                
+                // Hide message after 5 seconds
+                setTimeout(() => {
+                    subscriptionMessage.classList.add('hidden');
+                }, 5000);
+            }
         });
     </script>
 </body>

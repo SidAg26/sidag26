@@ -1,0 +1,50 @@
+name: Daily Serverless Blog
+
+on:
+  workflow_dispatch: # Manual trigger from any branch
+  schedule:
+    - cron: "0 9 * * *"  # Daily 9AM UTC
+  push:
+    branches:
+      - '**'  # All branches
+    paths:
+      # - 'blog/**'
+      - '.github/workflows/blog.yml'
+      - 'blog.py'
+      - 'blog/topics.md'
+  pull_request:
+    branches:
+      - '**'  # All branches
+    paths:
+      # - 'blog/**'
+      - '.github/workflows/blog.yml'
+
+# Add permissions for git operations
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install openai requests google-generativeai
+
+      - name: Generate Blog Draft and Update Index
+        run: python blog.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -67,26 +67,25 @@ def generate_blog_with_gemini(prompt: str):
         return None
 
     try:
-        # Using 'gemini-2.5-flash-preview-05-20' for text generation as 'gemini-pro' might not be available for generateContent in v1beta
+        # For testing purposes, we are modifying the prompt to request plain text
+        # This will help us determine if the issue is with HTML generation or the topic itself.
+        plain_text_prompt = f"Write a detailed technical blog post (plain text, markdown preferred) on the following topic:\n\nTopic: {topic}\n\nDo NOT include any HTML tags or specific placeholders from TEMPLATE.html."
+
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
-            prompt,
-            generation_config=GenerationConfig( # Use imported GenerationConfig
+            plain_text_prompt, # Use the modified plain text prompt here
+            generation_config=GenerationConfig(
                 temperature=0.7,
                 max_output_tokens=2000
             )
         )
         
-        # Access the generated text directly from the response object
-        # Check if any parts are present before accessing .text
-        if response and response.parts: # Check if response.parts exist
-            print(response.text)
-            return response.text
+        if response and response.parts:
+            # If plain text generation works, we'll return it, but remember it's not HTML
+            return response.text 
         else:
-            # If no parts, check for finish_reason for more specific feedback
             finish_reason = None
             if hasattr(response, 'candidates') and response.candidates:
-                # Assuming the first candidate for finish_reason
                 first_candidate = response.candidates[0]
                 if hasattr(first_candidate, 'finish_reason'):
                     finish_reason = first_candidate.finish_reason
@@ -140,10 +139,12 @@ Follow TEMPLATE.html placeholders exactly:
 
     # Fallback to Gemini
     if GEMINI_API_KEY and genai:
-        print("Attempting to generate blog with Gemini...")
-        gemini_result = generate_blog_with_gemini(prompt)
+        print("Attempting to generate blog with Gemini (plain text for testing)...")
+        gemini_result = generate_blog_with_gemini(topic) # Pass topic, generate_blog_with_gemini will make its own prompt
         if gemini_result:
-            print("Gemini generation successful.")
+            print("Gemini generation successful (plain text).")
+            # IMPORTANT: This will now return plain text, not HTML.
+            # You'll need to handle converting this to HTML if this test succeeds.
             return gemini_result
         else:
             print("Gemini fallback also failed to generate content.")

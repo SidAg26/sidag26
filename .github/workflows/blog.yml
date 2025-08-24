@@ -1,9 +1,21 @@
 name: Daily Serverless Blog
 
 on:
-  workflow_dispatch: # Manual trigger testing
+  workflow_dispatch: # Manual trigger from any branch
   schedule:
     - cron: "0 9 * * *"  # Daily 9AM UTC
+  push:
+    branches:
+      - '**'  # All branches
+    paths:
+      - 'blog/**'
+      - '.github/workflows/blog.yml'
+  pull_request:
+    branches:
+      - '**'  # All branches
+    paths:
+      - 'blog/**'
+      - '.github/workflows/blog.yml'
 
 jobs:
   generate-blog:

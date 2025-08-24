@@ -32,10 +32,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install openai requests
+          pip install --upgrade pip
+          pip install openai requests google-generativeai
 
       - name: Generate Blog Draft and Update Index
         run: python blog.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

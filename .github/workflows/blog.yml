@@ -1,0 +1,29 @@
+name: Daily Serverless Blog
+
+on:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: "0 9 * * *"  # Daily 9AM UTC
+
+jobs:
+  generate-blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install openai requests
+
+      - name: Generate Blog Draft and Update Index
+        run: python blog.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

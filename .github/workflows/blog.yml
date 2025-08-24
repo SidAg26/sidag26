@@ -1,7 +1,7 @@
 name: Daily Serverless Blog
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Manual trigger testing
   schedule:
     - cron: "0 9 * * *"  # Daily 9AM UTC
 

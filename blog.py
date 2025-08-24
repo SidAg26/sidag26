@@ -823,25 +823,23 @@ def ensure_placeholder_exists():
         return True
 
 def update_index(title, filename):
-    """Add new blog entry to index.html in the blog grid."""
-    if not Path(INDEX_FILE).exists():
-        print(f"Error: {INDEX_FILE} not found. Cannot update index.")
-        return
-
-    # First, ensure the placeholder exists
-    ensure_placeholder_exists()
-
+    """Update blog/index.html with new blog entry"""
+    print(f"🔄 Updating blog index with: {title}")
+    
+    # Read the current index file
     with open(INDEX_FILE, "r", encoding='utf-8') as f:
         html = f.read()
-
-    date_str = datetime.date.today().strftime("%b %d, %Y")
-    read_time = "5 min read"  # This can be parsed from AI output if {{READ_TIME}} is filled
     
-    # Create the new blog card HTML
-    post_html = f'''
-                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
+    # Ensure the placeholder exists at the top of the grid
+    ensure_placeholder_exists()
+    
+    # Generate the HTML for the new blog post
+    current_date = datetime.datetime.now().strftime("%B %d, %Y")
+    read_time = "5 min read"  # Default read time
+    
+    post_html = f'''                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
                     <div class="flex items-center mb-3">
-                        <span class="text-gray-400 text-sm">{date_str}</span>
+                        <span class="text-gray-400 text-sm">{current_date}</span>
                     </div>
                     <h3 class="text-xl font-bold text-primary mb-3">
                         🚀 {title}

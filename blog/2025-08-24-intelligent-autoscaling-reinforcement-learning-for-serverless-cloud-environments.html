@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Autoscaling: Reinforcement Learning for Serverless Cloud Environments - Siddharth Agarwal</title>
+    <meta name="description" content="Serverless computing has transformed how applications are built and deployed, offering unparalleled scalability, reduced operational overhead, and a pay-per-execution cost model. Developers can focus purely on code, leaving infrastructure management to the cloud provider. However, this abstraction introduces new challenges, particularly in managing resources efficiently. While cloud providers offer built-in autoscaling, these mechanisms are often reactive, relying on predefined thresholds or simple heuristics, which can lead to suboptimal performance (e.g., cold starts, high latency) or unnecessary costs (e.g., over-provisioning).">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Styling unchanged from your template */
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .blog-content { line-height: 1.8; font-size: 1.1rem; }
+        .blog-content h2 { color: #58a6ff; font-size: 1.8rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content h3 { color: #ffffff; font-size: 1.4rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .blog-content p { margin-bottom: 1.5rem; color: #c9d1d9; }
+        .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .blog-content li { margin-bottom: 0.5rem; color: #c9d1d9; }
+        .blog-content code { background: rgba(88, 166, 255, 0.1); color: #58a6ff; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; }
+        .blog-content pre { background: #1a1a1a; border: 1px solid #333; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1.5rem 0; }
+        .blog-content pre code { background: none; color: #e6e6e6; padding: 0; }
+        .tag { display: inline-block; padding: 0.25rem 0.5rem; margin: 0.125rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .table-of-contents { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.75rem; padding: 1.5rem; margin: 2rem 0; }
+        .table-of-contents ul { list-style: none; padding: 0; }
+        .table-of-contents li { margin-bottom: 0.5rem; }
+        .table-of-contents a { color: #58a6ff; text-decoration: none; transition: color 0.2s ease; }
+        .table-of-contents a:hover { color: #ffffff; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-primary">🚀 Siddharth Agarwal</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="../index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="../index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="../index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="../index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="../index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+                <a href="../index.html" class="back-button">← Back to Portfolio</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Article Header -->
+    <section class="gradient-bg py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <a href="./index.html" class="text-primary hover:underline mb-4 inline-block">← Back to Blog</a>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">🚀 Intelligent Autoscaling: Reinforcement Learning for Serverless Cloud Environments</h1>
+            <p class="text-xl text-secondary mb-8">Serverless computing has transformed how applications are built and deployed, offering unparalleled scalability, reduced operational overhead, and a pay-per-execution cost model. Developers can focus purely on code, leaving infrastructure management to the cloud provider. However, this abstraction introduces new challenges, particularly in managing resources efficiently. While cloud providers offer built-in autoscaling, these mechanisms are often reactive, relying on predefined thresholds or simple heuristics, which can lead to suboptimal performance (e.g., cold starts, high latency) or unnecessary costs (e.g., over-provisioning).</p>
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <span class="tag">Serverless</span> <span class="tag">Cloud Computing</span> <span class="tag">Scaling</span> <span class="tag">Auto-scaling</span>
+            </div>
+            <div class="flex items-center justify-center text-gray-400 text-sm space-x-4">
+                <span>📅 August 24, 2025</span>
+                <span>📖 12</span>
+                <span>🔬 Research</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <article class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h3 class="text-lg font-bold text-white mb-4">📋 Table of Contents</h3>
+                <ul><li><a href="#introduction">Introduction</a></li><li><a href="#core-concepts-and-fundamentals">Core Concepts and Fundamentals</a></li><li><a href="#implementation-strategies-and-best-practices">Implementation Strategies and Best Practices</a></li><li><a href="#advanced-techniques-and-optimization">Advanced Techniques and Optimization</a></li><li><a href="#real-world-applications-and-case-studies">Real-World Applications and Case Studies</a></li><li><a href="#conclusion-and-future-considerations">Conclusion and Future Considerations</a></li></ul>
+            </div>
+
+            <!-- Article Body -->
+            <div class="blog-content">
+                <h2 id="introduction">Introduction</h2>
+<p>Serverless computing has transformed how applications are built and deployed, offering unparalleled scalability, reduced operational overhead, and a pay-per-execution cost model. Developers can focus purely on code, leaving infrastructure management to the cloud provider. However, this abstraction introduces new challenges, particularly in managing resources efficiently. While cloud providers offer built-in autoscaling, these mechanisms are often reactive, relying on predefined thresholds or simple heuristics, which can lead to suboptimal performance (e.g., cold starts, high latency) or unnecessary costs (e.g., over-provisioning).</p>
+<p>The dynamic and bursty nature of Serverless workloads, coupled with the fine-grained billing model, demands a more intelligent and adaptive approach to resource allocation. Traditional rule-based autoscalers struggle to anticipate demand, learn from complex patterns, or balance the intricate trade-offs between performance, cost, and availability in real-time. This is where the power of Artificial Intelligence, specifically Reinforcement Learning (RL), comes into play, offering a paradigm shift in how we manage Serverless resources.</p>
+<p>Reinforcement Learning provides a framework for an 'agent' to learn optimal decision-making by interacting with an 'environment' and receiving 'rewards' or 'penalties'. Applied to Serverless autoscaling, an RL agent can continuously observe the system's state (traffic, latency, resource utilization), take actions (scale up/down, adjust concurrency), and learn from the outcomes to maximize a cumulative reward that balances performance and cost. This proactive, adaptive, and data-driven approach promises to unlock the full potential of Serverless, ensuring applications are always optimally provisioned.</p>
+<pre><code>// A simple, reactive autoscaling function (non-RL)
+const allocateResources = (currentInvocations, maxCapacity, bufferFactor = 1.2) => {
+    const desiredInstances = Math.ceil(currentInvocations * bufferFactor);
+    return Math.min(desiredInstances, maxCapacity);
+};</code></pre>
+<pre><code>// Function to simulate monitoring performance metrics
+const monitorPerformance = () => {
+    const latency = Math.random() * 100 + 50; // ms
+    const throughput = Math.random() * 1000 + 200; // req/s
+    const coldStarts = Math.floor(Math.random() * 5);
+    return { latency, throughput, coldStarts };
+};</code></pre>
+<h2 id="core-concepts-and-fundamentals">Core Concepts and Fundamentals</h2>
+<p>At its heart, Reinforcement Learning involves an agent learning to make decisions by performing actions in an environment to achieve a goal. For Serverless autoscaling, this translates directly into an intelligent controller (the agent) observing the cloud environment (the Serverless platform and application), making scaling decisions (actions), and receiving feedback (rewards) based on the impact of those decisions on performance and cost.</p>
+<p>The key components of an RL system for autoscaling are:
+1. **Agent:** The autoscaling controller responsible for making decisions.
+2. **Environment:** The Serverless application, the underlying cloud infrastructure, and the incoming workload. This includes metrics like invocation rates, queue lengths, CPU/memory utilization, and network I/O.
+3. **State (S):** A representation of the current situation of the environment. This could be a vector of observed metrics such as current request rate, average latency, number of active instances, CPU utilization, memory usage, and even historical trends. A rich state representation is crucial for informed decision-making.
+4. **Action (A):** The scaling decisions the agent can take. These might include increasing the number of function instances, decreasing instances, adjusting concurrency limits per instance, or even pre-warming instances. Actions are discrete or continuous depending on the specific scaling mechanism.
+5. **Reward (R):** A scalar value that the agent receives after taking an action in a given state. The reward function is paramount as it encodes the objective of the autoscaler. A positive reward encourages desirable behavior (e.g., low latency, high throughput, optimal cost), while a negative reward (penalty) discourages undesirable behavior (e.g., cold starts, high latency, over-provisioning, under-provisioning).</p>
+<p>The agent's goal is to learn a 'policy' – a mapping from states to actions – that maximizes the cumulative reward over time. This involves an exploration-exploitation trade-off: the agent must explore different actions to discover better policies, but also exploit its current best policy to maximize immediate rewards. Common RL algorithms suitable for this problem include Q-learning (for discrete state/action spaces), Deep Q-Networks (DQN) for larger, continuous state spaces, and Policy Gradient methods (like A2C or PPO) which directly learn the policy.</p>
+<pre><code>import numpy as np
+
+# Example of defining the state for an RL agent
+def get_autoscaling_state(metrics):
+    # Metrics could include: current_invocations, avg_latency, cpu_util, memory_util, queue_depth, active_instances
+    return np.array([
+        metrics['current_invocations'],
+        metrics['avg_latency'],
+        metrics['cpu_utilization'],
+        metrics['memory_utilization'],
+        metrics['queue_depth'],
+        metrics['active_instances']
+    ])
+
+# Example of a simple reward function for autoscaling
+def calculate_reward(prev_state, action, current_state, cost_per_instance=0.01, latency_penalty_factor=0.5):
+    current_latency = current_state[1] # Assuming latency is at index 1
+    current_instances = current_state[5] # Assuming active_instances is at index 5
+
+    cost_penalty = current_instances * cost_per_instance
+    latency_penalty = max(0, current_latency - 100) * latency_penalty_factor # Penalty for latency > 100ms
+    
+    # Reward for good performance, penalty for cost and high latency
+    reward = -cost_penalty - latency_penalty
+    
+    # Add a small positive reward for meeting demand without excessive resources (more complex in reality)
+    if current_state[0] > 0 and current_latency < 100: # If there's demand and latency is good
+        reward += 0.1
+
+    return reward</code></pre>
+<h2 id="implementation-strategies-and-best-practices">Implementation Strategies and Best Practices</h2>
+<p>Implementing an RL-driven autoscaler for Serverless requires careful planning and execution. The first critical step is robust **data collection and feature engineering**. The quality of the state representation directly impacts the agent's ability to learn. This means continuously monitoring and collecting a wide array of metrics: invocation rates, request queue lengths, cold start durations, CPU/memory utilization per function, error rates, and even historical traffic patterns. These raw metrics must then be transformed into meaningful features that capture the system's dynamics and predict future behavior. For instance, instead of just current invocation rate, features like 'rate of change of invocations' or 'average invocations over the last 5 minutes' can be more informative.</p>
+<p>**Defining the reward function** is arguably the most crucial and challenging aspect. It must accurately reflect the desired trade-offs between conflicting objectives: minimizing cost while maximizing performance (e.g., low latency, high availability). A common approach is a weighted sum of penalties: `Reward = - (W_cost * cost + W_latency * latency + W_cold_start * cold_starts + W_under_provisioning * queue_depth)`. The weights (W) allow fine-tuning the agent's priorities. Iterative refinement and domain expertise are essential here, as a poorly designed reward function will lead to suboptimal or even detrimental scaling behavior.</p>
+<p>**Choosing the right RL algorithm** depends on the complexity of your state and action spaces. For simple, discrete scaling actions (e.g., scale by +1, -1, or 0 instances), Q-learning might suffice. However, Serverless environments often involve continuous states and potentially continuous actions (e.g., adjusting concurrency limits), making Deep Q-Networks (DQN) or Policy Gradient methods like Proximal Policy Optimization (PPO) more suitable. These algorithms can handle high-dimensional state spaces by leveraging neural networks to approximate the value function or policy.</p>
+<p>Before deploying an RL agent to a live production environment, **extensive simulation and offline training** are paramount. Use historical workload data to train and validate the agent in a simulated Serverless environment. This allows the agent to learn optimal policies without risking real-world performance or incurring high costs due to exploratory actions. Once trained, the agent can be deployed in a 'shadow' mode, making recommendations without actively controlling scaling, or gradually introduced via A/B testing against existing autoscalers. Continuous **online learning** can then refine the policy in production, adapting to evolving traffic patterns and application changes.</p>
+<pre><code>import pandas as pd
+
+# Example of feature engineering for RL state
+def create_features(raw_metrics_df):
+    features_df = raw_metrics_df.copy()
+    features_df['invocation_rate_5min_avg'] = features_df['current_invocations'].rolling(window=5).mean()
+    features_df['latency_std_dev'] = features_df['avg_latency'].rolling(window=3).std()
+    features_df['cpu_util_change'] = features_df['cpu_utilization'].diff()
+    # Fill NaN values created by rolling/diff operations
+    features_df = features_df.fillna(0)
+    return features_df
+
+# Example of a more detailed reward function balancing cost and performance
+def calculate_complex_reward(metrics, target_latency=80, max_cost_per_minute=0.05):
+    current_latency = metrics['avg_latency']
+    active_instances = metrics['active_instances']
+    current_cost = active_instances * 0.0005 # Example cost per instance per minute
+    queue_depth = metrics['queue_depth']
+    cold_starts = metrics['cold_starts']
+
+    # Penalties
+    latency_penalty = max(0, current_latency - target_latency) * 0.1
+    cost_penalty = max(0, current_cost - max_cost_per_minute) * 100 # High penalty for exceeding budget
+    queue_penalty = queue_depth * 0.05 # Penalty for pending requests
+    cold_start_penalty = cold_starts * 0.2 # Penalty for cold starts
+
+    # Reward for optimal state (e.g., low latency, low cost, no queue)
+    performance_reward = 0.5 if current_latency <= target_latency and queue_depth == 0 else 0
+
+    total_reward = performance_reward - latency_penalty - cost_penalty - queue_penalty - cold_start_penalty
+    return total_reward</code></pre>
+<h2 id="advanced-techniques-and-optimization">Advanced Techniques and Optimization</h2>
+<p>To further enhance the capabilities of RL for Serverless autoscaling, several advanced techniques can be employed. **Predictive scaling with RL** integrates time-series forecasting models (e.g., ARIMA, Prophet, or LSTMs) to predict future workload patterns. Instead of the RL agent reacting purely to the current state, it can incorporate a prediction of the next few minutes' traffic into its state representation. This allows the agent to make more proactive scaling decisions, significantly reducing cold starts and improving responsiveness, especially for predictable spikes.</p>
+<p>For complex Serverless applications composed of many interdependent functions, **Hierarchical Reinforcement Learning (HRL)** can be highly effective. HRL breaks down the overall scaling problem into a hierarchy of sub-problems. A 'meta-controller' might decide on the overall budget or instance pool for a group of services, while 'sub-controllers' manage scaling for individual functions within that budget. This approach simplifies the learning problem for each agent and can lead to more stable and efficient scaling across large microservice architectures.</p>
+<p>Another powerful approach is **Multi-Agent Reinforcement Learning (MARL)**, where multiple RL agents, each responsible for scaling a specific Serverless function or service, learn to coordinate their actions. This is particularly relevant when functions share resources or have dependencies. The challenge lies in the non-stationary environment created by other agents' learning processes, requiring specialized MARL algorithms that account for cooperation or competition. Furthermore, **Transfer Learning** can accelerate the training process by leveraging pre-trained policies from similar Serverless applications or simulated environments, reducing the need for extensive exploration in new deployments. This is especially useful in multi-tenant cloud environments where patterns might be transferable across different users or services.</p>
+<pre><code>import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+
+# Example of a simple predictive load function
+def predict_load(historical_data_series, look_ahead_steps=5):
+    # For demonstration, a simple random forest regressor
+    # In a real scenario, this would be a trained time-series model (e.g., LSTM, Prophet)
+    if len(historical_data_series) < 10: # Need enough data to train
+        return np.array([historical_data_series[-1]] * look_ahead_steps)
+    
+    X = np.array([historical_data_series[i:i+5] for i in range(len(historical_data_series)-5)])
+    y = np.array([historical_data_series[i+5] for i in range(len(historical_data_series)-5)])
+    
+    model = RandomForestRegressor(n_estimators=10, random_state=42)
+    model.fit(X, y)
+    
+    last_window = historical_data_series[-5:].reshape(1, -1)
+    predictions = [model.predict(last_window)[0]]
+    for _ in range(look_ahead_steps - 1):
+        last_window = np.append(last_window[:, 1:], predictions[-1]).reshape(1, -1)
+        predictions.append(model.predict(last_window)[0])
+        
+    return np.array(predictions)
+
+# Conceptual example of a hierarchical scaling decision (Pythonic pseudo-code)
+def hierarchical_scaling_decision(global_metrics, function_metrics):
+    # Meta-controller decides overall resource budget for the application
+    global_budget = decide_global_budget(global_metrics)
+
+    # Sub-controllers decide scaling for individual functions within the budget
+    function_scaling_actions = {}
+    for func_id, metrics in function_metrics.items():
+        # Each function's agent considers its own metrics and the global budget
+        action = decide_function_scale(func_id, metrics, global_budget)
+        function_scaling_actions[func_id] = action
+
+    return function_scaling_actions</code></pre>
+<h2 id="real-world-applications-and-case-studies">Real-World Applications and Case Studies</h2>
+<p>The application of Reinforcement Learning for Serverless autoscaling holds immense potential across various industries. Consider an e-commerce platform experiencing highly unpredictable traffic spikes during flash sales or holiday seasons. A traditional autoscaler might react too slowly, leading to customer frustration due to high latency or even service outages. An RL agent, trained on historical data and continuously learning, could proactively scale resources, anticipating demand surges and minimizing cold starts, thereby ensuring a seamless shopping experience and maximizing revenue. Similarly, in media streaming services, where viewership can fluctuate dramatically, RL can optimize resource allocation to maintain high quality of service while keeping infrastructure costs in check.</p>
+<p>Another compelling use case is in IoT data processing pipelines. Serverless functions are often used to ingest, process, and transform vast streams of data from millions of devices. The incoming data rate can be highly variable. An RL autoscaler can dynamically adjust the number of processing functions to match the ingress rate, preventing backlogs and ensuring real-time data processing without over-provisioning expensive compute resources. This is particularly critical in applications like autonomous vehicles or industrial monitoring where timely data processing is paramount.</p>
+<p>While specific public case studies of full-scale RL autoscaling in production Serverless environments are still emerging, major cloud providers like AWS, Google Cloud, and Azure are heavily investing in AI/ML-driven resource management. Research papers and proof-of-concept implementations consistently demonstrate significant benefits, including 20-40% cost savings due to more efficient resource utilization, and up to 50% reduction in latency-related performance issues. The primary lessons learned often revolve around the complexity of defining robust reward functions, the need for high-fidelity simulation environments, and the challenges of managing exploration-exploitation in live systems.</p>
+<pre><code>import time
+
+# Simulate deploying a new version and monitoring its health
+def deploy_with_rl_monitoring(new_version_config, rl_agent_monitor):
+    print(f"Deploying version: {new_version_config['version']}")
+    # Simulate deployment process
+    time.sleep(5)
+    
+    # RL agent monitors health and performance post-deployment
+    health_metrics = rl_agent_monitor.get_current_health()
+    print(f"Current health metrics: {health_metrics}")
+    
+    if health_metrics['error_rate'] > 0.05 or health_metrics['latency'] > 200:
+        print("High error rate or latency detected. Initiating rollback...")
+        # Rollback logic here
+        return False
+    else:
+        print("Deployment successful and stable.")
+        return True
+
+# Generate a dashboard summary for the RL autoscaler's performance
+def generate_rl_dashboard_summary(performance_logs):
+    total_cost = sum(log['cost'] for log in performance_logs)
+    avg_latency = np.mean([log['latency'] for log in performance_logs])
+    cold_starts_count = sum(log['cold_starts'] for log in performance_logs)
+    
+    status = "Optimal" if avg_latency < 100 and cold_starts_count == 0 else "Needs Attention"
+    recommendations = []
+    if avg_latency > 100: recommendations.append("Review latency penalty in reward function.")
+    if cold_starts_count > 0: recommendations.append("Consider pre-warming strategies or higher base instances.")
+    
+    return {
+        "status": status,
+        "total_cost": f"${total_cost:.2f}",
+        "average_latency_ms": f"{avg_latency:.2f}",
+        "total_cold_starts": cold_starts_count,
+        "recommendations": recommendations
+    }</code></pre>
+<h2 id="conclusion-and-future-considerations">Conclusion and Future Considerations</h2>
+<p>Reinforcement Learning represents a significant leap forward in the quest for truly intelligent and adaptive autoscaling in Serverless cloud environments. By enabling an agent to learn optimal resource allocation policies through continuous interaction and feedback, organizations can move beyond reactive, rule-based systems to proactive, predictive, and highly efficient resource management. The benefits are substantial: reduced operational costs through minimized over-provisioning, enhanced user experience due to consistently low latency and fewer cold starts, and improved system resilience against unpredictable workloads.</p>
+<p>As Serverless adoption continues to grow and workloads become increasingly complex, the need for sophisticated autoscaling solutions will only intensify. Future considerations for RL in this domain include the development of more robust and generalizable RL algorithms that can adapt to diverse application requirements with minimal retraining. The integration of Explainable AI (XAI) techniques will also be crucial to provide transparency into the agent's decisions, building trust and facilitating debugging. Furthermore, the standardization of RL environments and benchmarks for cloud resource management could accelerate research and adoption.</p>
+<p>For developers and cloud architects, embracing Reinforcement Learning for Serverless autoscaling is not just about optimization; it's about unlocking the full potential of cloud-native architectures. It empowers systems to become self-optimizing, continuously learning, and truly autonomous, paving the way for a new era of intelligent cloud operations. The journey involves careful data engineering, thoughtful reward function design, and rigorous testing, but the rewards in terms of cost savings and performance gains are well worth the effort.</p>
+            </div>
+
+            <!-- Author Bio -->
+            <div class="mt-16 p-6 bg-gray-900 rounded-xl border border-gray-800">
+                <h3 class="text-lg font-bold text-white mb-4">👨‍💻 About the Author</h3>
+                <p class="text-gray-300 mb-4">
+                    <strong>Siddharth Agarwal</strong> is a PhD Researcher in Cloud Computing & Distributed Systems at the University of Melbourne. His research focuses on serverless computing optimization, cold start reduction, and intelligent autoscaling using reinforcement learning.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="../index.html#research" class="tag hover:bg-primary/20 transition-colors">Research</a>
+                    <a href="../index.html#publications" class="tag hover:bg-primary/20 transition-colors">Publications</a>
+                    <a href="../index.html#contact" class="tag hover:bg-primary/20 transition-colors">Contact</a>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="mt-16 flex justify-between items-center">
+                <a href="./index.html" class="text-primary hover:underline">← Back to Blog</a>
+                <span class="text-gray-500">More articles coming soon!</span>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">© 2025 Siddharth Agarwal. Built with ❤️ and modern web technologies.</p>
+            <div class="mt-4">
+                <a href="../index.html" class="text-primary hover:underline">← Back to Portfolio</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth Scrolling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

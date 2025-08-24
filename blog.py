@@ -490,7 +490,16 @@ def generate_blog_html(topic):
         print("⚠️ No API keys configured. Running in test mode...")
         return generate_test_blog(topic)
     
-    return generate_structured_content(topic)
+    # Generate structured content
+    structured_content = generate_structured_content(topic)
+    
+    # Format it using the template
+    if structured_content:
+        print("🔄 Formatting content with template...")
+        return format_blog_with_template(topic, structured_content)
+    else:
+        print("❌ No structured content generated")
+        return None
 
 def format_blog_with_template(topic, content_html):
     """Format the AI-generated content using TEMPLATE.html"""
@@ -852,6 +861,7 @@ def update_index(title, filename):
 
     # Check if the placeholder exists
     if "<!-- BLOG-ENTRIES -->" in html:
+        print(f"🔍 Found BLOG-ENTRIES placeholder, replacing with new post...")
         # Replace the placeholder with new post + placeholder (preserving it for future posts)
         html = html.replace("<!-- BLOG-ENTRIES -->", post_html)
         
@@ -862,6 +872,15 @@ def update_index(title, filename):
         print(f"✅ Updated {INDEX_FILE} with new blog entry: {title}")
         print(f"📝 Blog post added to index: {filename}")
         print(f"🔍 BLOG-ENTRIES placeholder preserved for future posts")
+        
+        # Verify the update worked
+        with open(INDEX_FILE, "r", encoding='utf-8') as f:
+            updated_html = f.read()
+        if title in updated_html:
+            print(f"✅ Verification: Title '{title}' found in updated index")
+        else:
+            print(f"❌ Warning: Title '{title}' not found in updated index")
+            
     else:
         print(f"❌ Warning: '<!-- BLOG-ENTRIES -->' placeholder not found in {INDEX_FILE}")
         print("🔍 Looking for alternative insertion points...")

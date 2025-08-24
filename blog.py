@@ -80,6 +80,7 @@ def generate_blog_with_gemini(prompt: str):
         # Access the generated text directly from the response object
         # Check if any parts are present before accessing .text
         if response and response.parts: # Check if response.parts exist
+            print(response.text)
             return response.text
         else:
             # If no parts, check for finish_reason for more specific feedback

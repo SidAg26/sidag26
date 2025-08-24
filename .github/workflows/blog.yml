@@ -10,6 +10,7 @@ on:
     paths:
       - 'blog/**'
       - '.github/workflows/blog.yml'
+      - 'blog.py'
   pull_request:
     branches:
       - '**'  # All branches

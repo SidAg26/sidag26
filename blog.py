@@ -159,21 +159,95 @@ def send_to_slack(message_html):
         print("Slack Webhook URL not configured. Skipping Slack notification.")
         return
 
+    # Convert HTML to plain text for Slack
+    import re
+    
+    def html_to_text(html_content):
+        """Convert HTML to readable plain text"""
+        # Remove HTML tags
+        text = re.sub(r'<[^>]+>', '', html_content)
+        # Decode HTML entities
+        text = text.replace('&nbsp;', ' ')
+        text = text.replace('&amp;', '&')
+        text = text.replace('&lt;', '<')
+        text = text.replace('&gt;', '>')
+        text = text.replace('&quot;', '"')
+        # Clean up whitespace
+        text = re.sub(r'\s+', ' ', text)
+        text = text.strip()
+        # Limit length to avoid Slack limits
+        if len(text) > 2000:
+            text = text[:1997] + "..."
+        return text
+    
+    # Convert HTML to plain text
+    plain_text = html_to_text(message_html)
+    
+    # Create a better Slack message structure
     payload = {
-        "text": "Here is your blog draft:",
+        "text": "📝 New Blog Draft Generated!",
         "blocks": [
             {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "🚀 New Blog Post Draft"
+                }
+            },
+            {
                 "type": "section",
-                "text": {"type": "mrkdwn", "text": message_html}
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Topic:* {plain_text[:100]}..."
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*Preview:* {plain_text[:500]}..."
+                }
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "Check your local files for the complete draft"
+                    }
+                ]
             }
         ]
     }
+    
     try:
         response = requests.post(SLACK_WEBHOOK_URL, json=payload)
         response.raise_for_status()
-        print("Blog draft sent to Slack.")
+        print("Blog draft sent to Slack successfully.")
     except requests.exceptions.RequestException as e:
         print(f"Failed to send blog draft to Slack: {e}")
+        # Try a simpler fallback message
+        try:
+            simple_payload = {
+                "text": f"📝 Blog draft generated for topic: {plain_text[:100]}...",
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"*New Blog Draft:* {plain_text[:200]}..."
+                        }
+                    }
+                ]
+            }
+            response = requests.post(SLACK_WEBHOOK_URL, json=simple_payload)
+            response.raise_for_status()
+            print("Fallback Slack message sent successfully.")
+        except Exception as fallback_error:
+            print(f"Fallback Slack message also failed: {fallback_error}")
 
 def save_blog_file(title, content_html):
     """Save the generated blog as HTML in blog folder."""

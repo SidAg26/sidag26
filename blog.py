@@ -75,12 +75,50 @@ def generate_blog_with_gemini(prompt: str):
 
     try:
         print("🔑 Using Gemini API key:", GEMINI_API_KEY[:10] + "..." if GEMINI_API_KEY else "None")
+        
+        # Create a more concise prompt for Gemini to avoid truncation
+        concise_prompt = f"""
+Generate a blog post about: {prompt.split('Generate a blog post about: ')[1].split('\n')[0]}
+
+Return ONLY a valid JSON object with this structure:
+{{
+    "title": "Blog Title",
+    "description": "Short description",
+    "sections": [
+        {{
+            "heading": "Introduction",
+            "content": "1 paragraphs about the topic",
+            "code_examples": []
+        }},
+        {{
+            "heading": "Core Concepts",
+            "content": "1-2 paragraphs explaining main concepts",
+            "code_examples": ["// Example code 1", "// Example code 2"]
+        }},
+        {{
+            "heading": "Best Practices",
+            "content": "1 paragraphs with implementation guidance",
+            "code_examples": ["// Best practice example"]
+        }},
+        {{
+            "heading": "Conclusion",
+            "content": "1 paragraphs summarizing key points",
+            "code_examples": []
+        }}
+    ],
+    "tags": ["Serverless", "Cloud Computing"],
+    "read_time": 5
+}}
+
+IMPORTANT: Return ONLY valid JSON, no other text. Keep content concise to avoid truncation.
+"""
+        
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
-            prompt,
+            concise_prompt,
             generation_config=GenerationConfig(
                 temperature=0.3,
-                max_output_tokens=2000
+                max_output_tokens=4000  # Increased token limit
             )
         )
         
@@ -235,16 +273,116 @@ Remember: Return ONLY the JSON object, nothing else.
     except json.JSONDecodeError as e:
         print(f"❌ Failed to parse JSON: {e}")
         print("📄 Raw content:", blog_content)
+        
         # Try to extract JSON from the response
         json_match = re.search(r'\{.*\}', blog_content, re.DOTALL)
         if json_match:
             try:
-                structured_data = json.loads(json_match.group(0))
+                extracted_json = json_match.group(0)
+                # Try to fix common JSON issues
+                fixed_json = fix_truncated_json(extracted_json)
+                structured_data = json.loads(fixed_json)
+                print("✅ Successfully parsed extracted and fixed JSON")
                 return build_html_from_structure(structured_data)
-            except json.JSONDecodeError:
-                pass
+            except json.JSONDecodeError as json_error:
+                print(f"❌ Failed to parse extracted JSON: {json_error}")
+        
+        # Try to build content from partial JSON
+        print("🔄 Attempting to build content from partial JSON...")
+        partial_content = build_from_partial_json(blog_content, topic)
+        if partial_content:
+            return partial_content
+        
         # Final fallback: treat as plain text
+        print("⚠️ Using final fallback: plain text conversion")
         return f"<h2>Introduction</h2><p>Error: Could not parse structured content. Please check the AI generation.</p>"
+
+def fix_truncated_json(json_string):
+    """Attempt to fix common JSON truncation issues"""
+    print("🔧 Attempting to fix truncated JSON...")
+    
+    # Remove trailing commas before closing braces/brackets
+    json_string = re.sub(r',(\s*[}\]])', r'\1', json_string)
+    
+    # Try to close unclosed strings
+    json_string = re.sub(r'([^"])\s*$', r'\1"', json_string)
+    
+    # Try to close unclosed objects/arrays
+    open_braces = json_string.count('{') - json_string.count('}')
+    open_brackets = json_string.count('[') - json_string.count(']')
+    
+    if open_braces > 0:
+        json_string += '}' * open_braces
+    if open_brackets > 0:
+        json_string += ']' * open_brackets
+    
+    print(f"🔧 Fixed JSON: {len(json_string)} characters")
+    return json_string
+
+def build_from_partial_json(content, topic):
+    """Build HTML content from partial or malformed JSON"""
+    print("🔄 Building content from partial JSON...")
+    
+    try:
+        # Try to extract what we can from the content
+        title_match = re.search(r'"title":\s*"([^"]+)"', content)
+        title = title_match.group(1) if title_match else f"Understanding {topic}"
+        
+        # Extract sections content
+        sections_match = re.search(r'"sections":\s*\[(.*?)\]', content, re.DOTALL)
+        if sections_match:
+            sections_content = sections_match.group(1)
+            # Try to extract individual sections
+            section_matches = re.findall(r'\{[^{}]*"heading":\s*"([^"]+)"[^{}]*"content":\s*"([^"]*)"', sections_content, re.DOTALL)
+            
+            if section_matches:
+                sections = []
+                for heading, content_text in section_matches:
+                    # Clean up content text
+                    clean_content = content_text.replace('\\n', '\n').replace('\\"', '"')
+                    sections.append({
+                        "heading": heading,
+                        "content": clean_content,
+                        "code_examples": []
+                    })
+                
+                # Create structured content
+                structured_data = {
+                    "title": title,
+                    "description": f"A comprehensive guide about {topic}",
+                    "sections": sections,
+                    "tags": ["Cloud Computing", "Research"],
+                    "read_time": 5
+                }
+                
+                print(f"✅ Built content from {len(sections)} extracted sections")
+                return build_html_from_structure(structured_data)
+        
+        # If we can't extract sections, try to get any content
+        content_match = re.search(r'"content":\s*"([^"]*)"', content)
+        if content_match:
+            content_text = content_match.group(1).replace('\\n', '\n').replace('\\"', '"')
+            fallback_content = {
+                "title": title,
+                "description": f"A comprehensive guide about {topic}",
+                "sections": [
+                    {
+                        "heading": "Introduction",
+                        "content": content_text,
+                        "code_examples": []
+                    }
+                ],
+                "tags": ["Cloud Computing", "Research"],
+                "read_time": 3
+            }
+            
+            print("✅ Built content from extracted content field")
+            return build_html_from_structure(fallback_content)
+            
+    except Exception as e:
+        print(f"❌ Error building from partial JSON: {e}")
+    
+    return None
 
 def build_html_from_structure(structured_content):
     """Build HTML from structured content"""

@@ -250,48 +250,50 @@ def send_to_slack(message_html):
             print(f"Fallback Slack message also failed: {fallback_error}")
 
 def save_blog_file(title, content_html):
-    """Save the generated blog using GitHub API."""
-    import base64
-    import requests
-    
+    """Save the generated blog as HTML in blog folder and commit to git."""
+    # Ensure BLOG_DIR exists
+    Path(BLOG_DIR).mkdir(parents=True, exist_ok=True)
+
     date_str = datetime.date.today().strftime("%Y-%m-%d")
+    # Clean title for filename slug
     filename_slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
-    if not filename_slug:
+    if not filename_slug: # Fallback if title becomes empty after sanitization
         filename_slug = "untitled-blog-post"
-    
     filename = f"{BLOG_DIR}/{date_str}-{filename_slug}.html"
     
-    # Get the current branch name
-    branch = os.environ.get('GITHUB_REF_NAME', 'main')
+    # Save the file locally
+    with open(filename, "w") as f:
+        f.write(content_html)
     
-    # GitHub API endpoint
-    api_url = f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/contents/{filename}"
-    
-    # Prepare the file content
-    headers = {
-        "Authorization": f"token {os.environ['GITHUB_TOKEN']}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-    
-    data = {
-        "message": f"Add blog post: {title}",
-        "content": base64.b64encode(content_html.encode()).decode(),
-        "branch": branch
-    }
-    
+    # Commit and push to git
     try:
-        response = requests.put(api_url, headers=headers, json=data)
-        response.raise_for_status()
-        print(f"Blog post created via GitHub API: {filename}")
-        return filename
-    except requests.exceptions.RequestException as e:
-        print(f"GitHub API failed: {e}")
-        # Fallback to local save
-        Path(BLOG_DIR).mkdir(parents=True, exist_ok=True)
-        with open(filename, "w") as f:
-            f.write(content_html)
-        print(f"Blog post saved locally (GitHub API failed): {filename}")
-        return filename
+        import subprocess
+        import os
+        
+        # Configure git for the workflow
+        subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"], check=True)
+        
+        # Add the new file
+        subprocess.run(["git", "add", filename], check=True)
+        
+        # Commit the changes
+        commit_message = f"Add blog post: {title}"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Push to the current branch
+        subprocess.run(["git", "push"], check=True)
+        
+        print(f"Blog post committed and pushed to git: {filename}")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Git operations failed: {e}")
+        print("Blog file saved locally but not committed to git")
+    except Exception as e:
+        print(f"Unexpected error during git operations: {e}")
+        print("Blog file saved locally but not committed to git")
+    
+    return filename
 
 def update_index(title, filename):
     """Add new blog entry to index.html in the blog grid."""

@@ -740,11 +740,82 @@ def save_blog_file(title, content_html):
     
     return filename
 
+def ensure_placeholder_exists():
+    """Ensure the BLOG-ENTRIES placeholder exists in the index file"""
+    if not Path(INDEX_FILE).exists():
+        print(f"❌ {INDEX_FILE} not found. Cannot ensure placeholder.")
+        return False
+
+    with open(INDEX_FILE, "r", encoding='utf-8') as f:
+        html = f.read()
+
+    if "<!-- BLOG-ENTRIES -->" in html:
+        print("✅ BLOG-ENTRIES placeholder found")
+        return True
+    else:
+        print("⚠️ BLOG-ENTRIES placeholder missing. Adding it back...")
+        
+        # Find the "Coming Soon" card and add the placeholder before it
+        coming_soon_pattern = '''                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center mb-3">
+                        <span class="text-gray-400 text-sm">Coming Soon</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        🚀 More Blog Posts Coming Soon!
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        I'm working on more articles about cloud computing, serverless optimization, and distributed systems research. Stay tuned!
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">Coming Soon</span>
+                        <span class="tag">Cloud Computing</span>
+                        <span class="tag">Research</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400 text-sm">📖 More content soon</span>
+                        <span class="text-gray-500">Stay tuned!</span>
+                    </div>
+                </div>'''
+        
+        # Add the placeholder before the Coming Soon card
+        placeholder_html = '''                <!-- BLOG-ENTRIES -->
+                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center mb-3">
+                        <span class="text-gray-400 text-sm">Coming Soon</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        🚀 More Blog Posts Coming Soon!
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        I'm working on more articles about cloud computing, serverless optimization, and distributed systems research. Stay tuned!
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">Coming Soon</span>
+                        <span class="tag">Cloud Computing</span>
+                        <span class="tag">Research</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400 text-sm">📖 More content soon</span>
+                        <span class="text-gray-500">Stay tuned!</span>
+                    </div>
+                </div>'''
+        
+        html = html.replace(coming_soon_pattern, placeholder_html)
+        
+        with open(INDEX_FILE, "w", encoding='utf-8') as f:
+            f.write(html)
+        
+        print("✅ BLOG-ENTRIES placeholder restored")
+        return True
+
 def update_index(title, filename):
     """Add new blog entry to index.html in the blog grid."""
     if not Path(INDEX_FILE).exists():
         print(f"Error: {INDEX_FILE} not found. Cannot update index.")
         return
+
+    # First, ensure the placeholder exists
+    ensure_placeholder_exists()
 
     with open(INDEX_FILE, "r", encoding='utf-8') as f:
         html = f.read()
@@ -754,33 +825,35 @@ def update_index(title, filename):
     
     # Create the new blog card HTML
     post_html = f'''
-<div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
-    <div class="flex items-center mb-3">
-        <span class="text-gray-400 text-sm">{date_str}</span>
-    </div>
-    <h3 class="text-xl font-bold text-primary mb-3">
-        🚀 {title}
-    </h3>
-    <p class="text-gray-300 mb-4">
-        A comprehensive guide about {title.lower()}. Click to read the full article.
-    </p>
-    <div class="flex flex-wrap gap-2 mb-4">
-        <span class="tag">Serverless</span>
-        <span class="tag">Cloud Computing</span>
-        <span class="tag">Research</span>
-    </div>
-    <div class="flex items-center justify-between">
-        <span class="text-gray-400 text-sm">📖 {read_time}</span>
-        <a href="{Path(filename).name}" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors">
-            Read Full Article →
-        </a>
-    </div>
-</div>'''
+                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center mb-3">
+                        <span class="text-gray-400 text-sm">{date_str}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        🚀 {title}
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        A comprehensive guide about {title.lower()}. Click to read the full article.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">Serverless</span>
+                        <span class="tag">Cloud Computing</span>
+                        <span class="tag">Research</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400 text-sm">📖 {read_time}</span>
+                        <a href="{Path(filename).name}" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors">
+                            Read Full Article →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- BLOG-ENTRIES -->'''
 
     # Check if the placeholder exists
     if "<!-- BLOG-ENTRIES -->" in html:
-        # Replace the placeholder with new post + placeholder
-        html = html.replace("<!-- BLOG-ENTRIES -->", post_html + "\n<!-- BLOG-ENTRIES -->")
+        # Replace the placeholder with new post + placeholder (preserving it for future posts)
+        html = html.replace("<!-- BLOG-ENTRIES -->", post_html)
         
         # Write the updated HTML back to the file
         with open(INDEX_FILE, "w", encoding='utf-8') as f:
@@ -788,23 +861,49 @@ def update_index(title, filename):
         
         print(f"✅ Updated {INDEX_FILE} with new blog entry: {title}")
         print(f"📝 Blog post added to index: {filename}")
+        print(f"🔍 BLOG-ENTRIES placeholder preserved for future posts")
     else:
         print(f"❌ Warning: '<!-- BLOG-ENTRIES -->' placeholder not found in {INDEX_FILE}")
         print("🔍 Looking for alternative insertion points...")
         
         # Try to find a good place to insert (before the "Coming Soon" card)
         if "Coming Soon" in html:
-            # Insert before the "Coming Soon" card
+            # Insert before the "Coming Soon" card and add the placeholder back
+            coming_soon_section = '''                <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center mb-3">
+                        <span class="text-gray-400 text-sm">Coming Soon</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3">
+                        🚀 More Blog Posts Coming Soon!
+                    </h3>
+                    <p class="text-gray-300 mb-4">
+                        I'm working on more articles about cloud computing, serverless optimization, and distributed systems research. Stay tuned!
+                    </p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tag">Coming Soon</span>
+                        <span class="tag">Cloud Computing</span>
+                        <span class="tag">Research</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400 text-sm">📖 More content soon</span>
+                        <span class="text-gray-500">Stay tuned!</span>
+                    </div>
+                </div>'''
+            
+            # Insert new post + placeholder before the Coming Soon section
+            new_content = post_html + '\n' + coming_soon_section
+            
             html = html.replace(
-                '<div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">',
-                post_html + '\n\n<div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">',
-                1  # Only replace the first occurrence (the "Coming Soon" card)
+                coming_soon_section,
+                new_content,
+                1
             )
             
             with open(INDEX_FILE, "w", encoding='utf-8') as f:
                 f.write(html)
             
             print(f"✅ Updated {INDEX_FILE} by inserting before 'Coming Soon' card")
+            print(f"🔍 BLOG-ENTRIES placeholder added back for future posts")
         else:
             print(f"❌ Could not find suitable insertion point in {INDEX_FILE}")
             print("📋 New blog post HTML (copy manually if needed):")
@@ -860,13 +959,19 @@ if __name__ == "__main__":
             update_index(topic, draft_file)
             print("✅ Blog index updated")
             
+            # 6. Verify placeholder is preserved
+            print("\n🔄 Step 6: Verifying placeholder preservation...")
+            if ensure_placeholder_exists():
+                print("✅ BLOG-ENTRIES placeholder verified and preserved")
+            else:
+                print("⚠️ Warning: Could not verify placeholder preservation")
+            
             print(f"\n🎉 Blog generation complete! New post: {draft_file}")
         else:
             print("❌ Skipping local save and index update as no blog content was generated.")
 
     except RuntimeError as e:
         print(f"❌ Critical error during blog generation: {e}")
-        exit(1)
     except Exception as e:
         print(f"❌ An unexpected error occurred: {e}")
         import traceback

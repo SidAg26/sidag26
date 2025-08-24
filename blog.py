@@ -12,7 +12,6 @@ except ImportError:
 
 try:
     import google.generativeai as genai
-    # Import types for better type hinting and configuration
     from google.generativeai.types import GenerationConfig
 except ImportError:
     genai = None
@@ -37,7 +36,6 @@ if GEMINI_API_KEY and genai:
 
 def get_next_topic():
     """Read the first topic from topics.md"""
-    # Ensure the directory for topics.md exists or handle its absence gracefully
     if not Path(TOPICS_FILE).exists():
         print(f"Error: {TOPICS_FILE} not found.")
         return None
@@ -47,7 +45,6 @@ def get_next_topic():
     if not topics:
         return None
     
-    # Return the first topic and the rest
     return topics[0], topics[1:]
 
 def update_topics_file(remaining_topics):
@@ -67,13 +64,9 @@ def generate_blog_with_gemini(prompt: str):
         return None
 
     try:
-        # For testing purposes, we are modifying the prompt to request plain text
-        # This will help us determine if the issue is with HTML generation or the topic itself.
-        plain_text_prompt = f"Write a detailed technical blog post (plain text, markdown preferred) on the following topic:\n\nTopic: {topic}\n\nDo NOT include any HTML tags or specific placeholders from TEMPLATE.html."
-
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
-            plain_text_prompt, # Use the modified plain text prompt here
+            prompt,
             generation_config=GenerationConfig(
                 temperature=0.7,
                 max_output_tokens=2000
@@ -81,8 +74,7 @@ def generate_blog_with_gemini(prompt: str):
         )
         
         if response and response.parts:
-            # If plain text generation works, we'll return it, but remember it's not HTML
-            return response.text 
+            return response.text
         else:
             finish_reason = None
             if hasattr(response, 'candidates') and response.candidates:
@@ -102,21 +94,18 @@ def generate_blog_with_gemini(prompt: str):
 def generate_blog_html(topic):
     """Try OpenAI first, fallback to Gemini."""
     prompt = f"""
-Write a detailed, informative, and purely technical blog in HTML format for the following topic:
+Write a detailed technical blog post about: {topic}
 
-Topic: {topic}
+Requirements:
+- Use proper HTML structure with <h2>, <h3>, <p>, <ul>, <ol>, <code>, <pre>
+- Include practical examples and code snippets
+- Make it informative and engaging
+- Target length: 800-1500 words
+- Focus on cloud computing, serverless, or distributed systems
+- Do NOT include <h1> tags (title is handled separately)
+- Do NOT include <html>, <head>, or <body> tags
 
-Focus solely on explaining concepts, best practices, and practical implementation details. Avoid any content that could be interpreted as controversial, harmful, or speculative beyond the technical scope.
-
-Follow TEMPLATE.html placeholders exactly:
-{{TITLE}}: Blog title
-{{DESCRIPTION}}: Short description/intro
-{{CONTENT}}: Main HTML content (<h2>, <h3>, <p>, <ul>, <ol>, <code>, <pre> etc.)
-{{TAGS}}: HTML span tags for tags
-{{DATE}}: Today’s date in Month Day, Year format
-{{READ_TIME}}: Approx. read time in minutes
-{{CATEGORY}}: Blog category
-{{TOC}}: Table of contents in <ul><li><a href="#section">Section</a></li></ul>
+Format the content with proper HTML tags but keep it as content only.
 """
     blog_content = None
 
@@ -132,26 +121,129 @@ Follow TEMPLATE.html placeholders exactly:
             )
             blog_content = response.choices[0].message.content
             print("OpenAI generation successful.")
-            return blog_content
         except Exception as e:
             print(f"OpenAI failed: {e}")
             print("Falling back to Gemini...")
 
     # Fallback to Gemini
-    if GEMINI_API_KEY and genai:
-        print("Attempting to generate blog with Gemini (plain text for testing)...")
-        gemini_result = generate_blog_with_gemini(topic) # Pass topic, generate_blog_with_gemini will make its own prompt
-        if gemini_result:
-            print("Gemini generation successful (plain text).")
-            # IMPORTANT: This will now return plain text, not HTML.
-            # You'll need to handle converting this to HTML if this test succeeds.
-            return gemini_result
-        else:
-            print("Gemini fallback also failed to generate content.")
-    else:
-        print("Gemini API key or library not available for fallback.")
+    if not blog_content and GEMINI_API_KEY and genai:
+        print("Attempting to generate blog with Gemini...")
+        blog_content = generate_blog_with_gemini(prompt)
+        if blog_content:
+            print("Gemini generation successful.")
+    
+    if not blog_content:
+        raise RuntimeError("No AI service available for blog generation.")
+    
+    # Format the content using your template
+    return format_blog_with_template(topic, blog_content)
 
-    raise RuntimeError("No AI service available for blog generation.")
+def format_blog_with_template(topic, content_html):
+    """Format the AI-generated content using TEMPLATE.html"""
+    
+    # Read the template file
+    template_path = Path(TEMPLATE_FILE)
+    if not template_path.exists():
+        print(f"Warning: {TEMPLATE_FILE} not found. Using raw content.")
+        return content_html
+    
+    with open(template_path, 'r', encoding='utf-8') as f:
+        template = f.read()
+    
+    # Extract key information from the AI content
+    # Extract title (look for first <h2> or use topic)
+    title_match = re.search(r'<h2[^>]*>(.*?)</h2>', content_html, re.IGNORECASE)
+    title = title_match.group(1).strip() if title_match else topic
+    
+    # Extract description (first paragraph)
+    desc_match = re.search(r'<p[^>]*>(.*?)</p>', content_html, re.IGNORECASE)
+    description = desc_match.group(1).strip() if desc_match else f"Comprehensive guide about {topic}"
+    
+    # Clean description (remove HTML tags)
+    description = re.sub(r'<[^>]+>', '', description)
+    
+    # Generate tags based on topic
+    tags = generate_tags_from_topic(topic)
+    
+    # Get current date and time
+    current_date = datetime.datetime.now().strftime("%B %d, %Y")
+    
+    # Estimate read time (rough calculation: 200 words per minute)
+    word_count = len(content_html.split())
+    read_time = max(1, round(word_count / 200))
+    
+    # Generate table of contents from headings
+    toc = generate_table_of_contents(content_html)
+    
+    # Replace template placeholders (using double curly braces as in your template)
+    formatted_content = template.replace('{{TITLE}}', title)
+    formatted_content = formatted_content.replace('{{DESCRIPTION}}', description)
+    formatted_content = formatted_content.replace('{{CONTENT}}', content_html)
+    formatted_content = formatted_content.replace('{{TAGS}}', tags)
+    formatted_content = formatted_content.replace('{{DATE}}', current_date)
+    formatted_content = formatted_content.replace('{{READ_TIME}}', str(read_time))
+    formatted_content = formatted_content.replace('{{CATEGORY}}', 'Research')
+    formatted_content = formatted_content.replace('{{TOC}}', toc)
+    
+    return formatted_content
+
+def generate_tags_from_topic(topic):
+    """Generate relevant tags based on the topic"""
+    topic_lower = topic.lower()
+    tags = []
+    
+    # Define tag mappings
+    tag_mappings = {
+        'serverless': 'Serverless',
+        'cloud': 'Cloud Computing',
+        'aws': 'AWS',
+        'lambda': 'AWS Lambda',
+        'performance': 'Performance',
+        'optimization': 'Optimization',
+        'scaling': 'Scaling',
+        'architecture': 'Architecture',
+        'distributed': 'Distributed Systems',
+        'research': 'Research',
+        'function': 'Functions',
+        'cold': 'Cold Start',
+        'start': 'Cold Start',
+        'autoscaling': 'Auto-scaling',
+        'faas': 'FaaS'
+    }
+    
+    for keyword, tag in tag_mappings.items():
+        if keyword in topic_lower:
+            tags.append(f'<span class="tag">{tag}</span>')
+    
+    # Add default tags if none found
+    if not tags:
+        tags = [
+            '<span class="tag">Cloud Computing</span>',
+            '<span class="tag">Research</span>'
+        ]
+    
+    return ' '.join(tags)
+
+def generate_table_of_contents(content):
+    """Generate table of contents from HTML content"""
+    # Find all headings (h2, h3)
+    headings = re.findall(r'<h([23])[^>]*>(.*?)</h[23]>', content, re.IGNORECASE)
+    
+    if not headings:
+        return '<ul><li><a href="#introduction">Introduction</a></li></ul>'
+    
+    toc_items = []
+    for level, heading_text in headings:
+        # Create anchor ID
+        anchor = re.sub(r'[^a-z0-9]+', '-', heading_text.lower()).strip('-')
+        
+        # Clean heading text (remove HTML tags)
+        clean_text = re.sub(r'<[^>]+>', '', heading_text)
+        
+        # Add to TOC
+        toc_items.append(f'<li><a href="#{anchor}">{clean_text}</a></li>')
+    
+    return f'<ul>{"".join(toc_items)}</ul>'
 
 def send_to_slack(message_html):
     """Send draft to Slack."""
@@ -262,13 +354,12 @@ def save_blog_file(title, content_html):
     filename = f"{BLOG_DIR}/{date_str}-{filename_slug}.html"
     
     # Save the file locally
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding='utf-8') as f:
         f.write(content_html)
     
     # Commit and push to git
     try:
         import subprocess
-        import os
         
         # Configure git for the workflow
         subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"], check=True)
@@ -312,7 +403,7 @@ def update_index(title, filename):
         <span class="text-gray-400 text-sm">{date_str}</span>
     </div>
     <h3 class="text-xl font-bold text-primary mb-3">
-        🚀 {title}
+        �� {title}
     </h3>
     <p class="text-gray-300 mb-4">
         Brief intro/summary of the article. (Update after approval if needed)
@@ -338,7 +429,6 @@ def update_index(title, filename):
         print(f"Updated {INDEX_FILE} with new blog entry.")
     else:
         print(f"Warning: '<!-- BLOG-ENTRIES -->' placeholder not found in {INDEX_FILE}. Index not updated.")
-
 
 # ===== Main =====
 if __name__ == "__main__":
@@ -375,4 +465,3 @@ if __name__ == "__main__":
         print(f"Critical error during blog generation: {e}")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-

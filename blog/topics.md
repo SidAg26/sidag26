@@ -1,3 +1,2 @@
-- Serverless function scaling explained
 - Optimizing cold starts in AWS Lambda
 - Reinforcement learning for cloud autoscaling in Serverless

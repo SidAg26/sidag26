@@ -103,9 +103,11 @@ def generate_blog_with_gemini(prompt: str):
 def generate_blog_html(topic):
     """Try OpenAI first, fallback to Gemini."""
     prompt = f"""
-Write a detailed technical blog in HTML format for the following topic:
+Write a detailed, informative, and purely technical blog in HTML format for the following topic:
 
 Topic: {topic}
+
+Focus solely on explaining concepts, best practices, and practical implementation details. Avoid any content that could be interpreted as controversial, harmful, or speculative beyond the technical scope.
 
 Follow TEMPLATE.html placeholders exactly:
 {{TITLE}}: Blog title

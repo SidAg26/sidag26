@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taming the Chill: Optimizing Cold Starts in AWS Lambda - Siddharth Agarwal</title>
+    <meta name="description" content="AWS Lambda's serverless model offers incredible scalability and cost efficiency, but it comes with a unique performance characteristic: the "cold start." A cold start occurs when Lambda needs to initialize a new execution environment for your function, typically after a period of inactivity or when scaling up. This initialization process, which includes downloading code, spinning up the runtime, and executing global code, can introduce noticeable latency, impacting user experience for latency-sensitive applications.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Styling unchanged from your template */
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .blog-content { line-height: 1.8; font-size: 1.1rem; }
+        .blog-content h2 { color: #58a6ff; font-size: 1.8rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content h3 { color: #ffffff; font-size: 1.4rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .blog-content p { margin-bottom: 1.5rem; color: #c9d1d9; }
+        .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .blog-content li { margin-bottom: 0.5rem; color: #c9d1d9; }
+        .blog-content code { background: rgba(88, 166, 255, 0.1); color: #58a6ff; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; }
+        .blog-content pre { background: #1a1a1a; border: 1px solid #333; border-radius: 0.5rem; padding: 1rem; overflow-x: auto; margin: 1.5rem 0; }
+        .blog-content pre code { background: none; color: #e6e6e6; padding: 0; }
+        .tag { display: inline-block; padding: 0.25rem 0.5rem; margin: 0.125rem; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 500; background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .table-of-contents { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.75rem; padding: 1.5rem; margin: 2rem 0; }
+        .table-of-contents ul { list-style: none; padding: 0; }
+        .table-of-contents li { margin-bottom: 0.5rem; }
+        .table-of-contents a { color: #58a6ff; text-decoration: none; transition: color 0.2s ease; }
+        .table-of-contents a:hover { color: #ffffff; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-primary">🚀 Siddharth Agarwal</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="../index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="../index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="../index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="../index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="../index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+                <a href="../index.html" class="back-button">← Back to Portfolio</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Article Header -->
+    <section class="gradient-bg py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <a href="./index.html" class="text-primary hover:underline mb-4 inline-block">← Back to Blog</a>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">🚀 Taming the Chill: Optimizing Cold Starts in AWS Lambda</h1>
+            <p class="text-xl text-secondary mb-8">AWS Lambda's serverless model offers incredible scalability and cost efficiency, but it comes with a unique performance characteristic: the "cold start." A cold start occurs when Lambda needs to initialize a new execution environment for your function, typically after a period of inactivity or when scaling up. This initialization process, which includes downloading code, spinning up the runtime, and executing global code, can introduce noticeable latency, impacting user experience for latency-sensitive applications.</p>
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <span class="tag">AWS</span> <span class="tag">AWS Lambda</span> <span class="tag">Cold Start</span> <span class="tag">Cold Start</span>
+            </div>
+            <div class="flex items-center justify-center text-gray-400 text-sm space-x-4">
+                <span>📅 August 24, 2025</span>
+                <span>📖 3</span>
+                <span>🔬 Research</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Content -->
+    <article class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h3 class="text-lg font-bold text-white mb-4">📋 Table of Contents</h3>
+                <ul><li><a href="#introduction">Introduction</a></li><li><a href="#core-concepts">Core Concepts</a></li><li><a href="#best-practices">Best Practices</a></li><li><a href="#conclusion">Conclusion</a></li></ul>
+            </div>
+
+            <!-- Article Body -->
+            <div class="blog-content">
+                <h2 id="introduction">Introduction</h2>
+<p>AWS Lambda's serverless model offers incredible scalability and cost efficiency, but it comes with a unique performance characteristic: the "cold start." A cold start occurs when Lambda needs to initialize a new execution environment for your function, typically after a period of inactivity or when scaling up. This initialization process, which includes downloading code, spinning up the runtime, and executing global code, can introduce noticeable latency, impacting user experience for latency-sensitive applications.</p>
+<h2 id="core-concepts">Core Concepts</h2>
+<p>A cold start's duration is influenced by several factors. When a function is invoked for the first time or after being idle, AWS provisions a new container, downloads your function's code, initializes the runtime (e.g., JVM for Java, Node.js engine), and then executes any code outside the main handler function. This "global scope" execution is a critical part of the cold start. Larger deployment packages, complex dependencies, and certain runtime choices can significantly extend this initial setup time. For instance, a Java function might take longer to initialize its JVM than a Python function, and heavy global imports in Node.js can also add to the delay.</p>
+<pre><code>// Example 1: Global initialization of a heavy dependency
+console.log('Lambda function initializing (cold start)...');
+const moment = require('moment-timezone'); // A relatively larger dependency
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
+
+exports.handler = async (event) => {
+    console.log('Function invoked!');
+    const now = moment().tz('America/New_York').format();
+    console.log('Current time:', now);
+    // ... rest of your handler logic
+    return { statusCode: 200, body: JSON.stringify({ time: now }) };
+};</code></pre>
+<pre><code>// Example 2: Illustrating the execution flow during cold start vs. warm invocation
+// This log runs ONLY during a cold start
+console.log('Global scope execution: Setting up environment.');
+
+exports.handler = async (event) => {
+    // This log runs on EVERY invocation (cold or warm)
+    console.log('Handler execution: Processing request.');
+    // Simulate some work
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return {
+        statusCode: 200,
+        body: JSON.stringify('Hello from Lambda!'),
+    };
+};</code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<p>Optimizing cold starts involves a multi-faceted approach. Firstly, **minimize your deployment package size** by removing unnecessary dependencies and using tools like Webpack for Node.js or ProGuard for Java. Secondly, **allocate sufficient memory**; higher memory often grants more CPU, accelerating initialization. For Java functions, **Lambda SnapStart** can dramatically reduce cold start times by pre-initializing the runtime and application code. If your function is in a VPC, consider **provisioned concurrency** to keep instances warm, or use a "warmer" function to periodically invoke your Lambda. Finally, **defer heavy initialization logic** outside the global scope and into the handler or a lazy-loaded function, ensuring it only runs when truly needed.</p>
+<pre><code>// Best practice: Lazy initialization of AWS SDK client
+let s3Client;
+
+exports.handler = async (event) => {
+    if (!s3Client) {
+        s3Client = new (require('aws-sdk').S3)(); // Initialize only when first needed
+        console.log('S3 client initialized for the first time in this execution.');
+    }
+    // ... rest of your handler logic using s3Client
+    const bucketName = event.bucket;
+    const objectKey = event.key;
+    try {
+        const data = await s3Client.getObject({ Bucket: bucketName, Key: objectKey }).promise();
+        return { statusCode: 200, body: JSON.stringify(data.Body.toString('utf-8')) };
+    } catch (error) {
+        console.error('Error fetching object:', error);
+        return { statusCode: 500, body: JSON.stringify({ message: error.message }) };
+    }
+};</code></pre>
+<h2 id="conclusion">Conclusion</h2>
+<p>While cold starts are an inherent characteristic of the serverless model, they are not insurmountable. By understanding the underlying causes and implementing best practices such as minimizing package size, optimizing memory, leveraging features like Lambda SnapStart and Provisioned Concurrency, and carefully structuring your initialization logic, you can significantly reduce their impact. Proactive optimization ensures your AWS Lambda functions deliver consistent, low-latency performance, providing a seamless experience for your users.</p>
+            </div>
+
+            <!-- Author Bio -->
+            <div class="mt-16 p-6 bg-gray-900 rounded-xl border border-gray-800">
+                <h3 class="text-lg font-bold text-white mb-4">👨‍💻 About the Author</h3>
+                <p class="text-gray-300 mb-4">
+                    <strong>Siddharth Agarwal</strong> is a PhD Researcher in Cloud Computing & Distributed Systems at the University of Melbourne. His research focuses on serverless computing optimization, cold start reduction, and intelligent autoscaling using reinforcement learning.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="../index.html#research" class="tag hover:bg-primary/20 transition-colors">Research</a>
+                    <a href="../index.html#publications" class="tag hover:bg-primary/20 transition-colors">Publications</a>
+                    <a href="../index.html#contact" class="tag hover:bg-primary/20 transition-colors">Contact</a>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="mt-16 flex justify-between items-center">
+                <a href="./index.html" class="text-primary hover:underline">← Back to Blog</a>
+                <span class="text-gray-500">More articles coming soon!</span>
+            </div>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-400">© 2025 Siddharth Agarwal. Built with ❤️ and modern web technologies.</p>
+            <div class="mt-4">
+                <a href="../index.html" class="text-primary hover:underline">← Back to Portfolio</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth Scrolling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

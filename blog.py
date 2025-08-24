@@ -87,7 +87,7 @@ Return ONLY a valid JSON object with this structure:
     "sections": [
         {{
             "heading": "Introduction",
-            "content": "1 paragraphs about the topic",
+            "content": "1 paragraph about the topic",
             "code_examples": []
         }},
         {{
@@ -97,12 +97,12 @@ Return ONLY a valid JSON object with this structure:
         }},
         {{
             "heading": "Best Practices",
-            "content": "1 paragraphs with implementation guidance",
+            "content": "1 paragraph with implementation guidance",
             "code_examples": ["// Best practice example"]
         }},
         {{
             "heading": "Conclusion",
-            "content": "1 paragraphs summarizing key points",
+            "content": "1 paragraph summarizing key points",
             "code_examples": []
         }}
     ],

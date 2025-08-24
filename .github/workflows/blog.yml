@@ -10,7 +10,6 @@ on:
     paths:
       - 'blog/**'
       - '.github/workflows/blog.yml'
-      - 'blog.py'
   pull_request:
     branches:
       - '**'  # All branches
@@ -18,13 +17,21 @@ on:
       - 'blog/**'
       - '.github/workflows/blog.yml'
 
+# Add permissions for git operations
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   generate-blog:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Full history for git operations
 
       - name: Setup Python
         uses: actions/setup-python@v4

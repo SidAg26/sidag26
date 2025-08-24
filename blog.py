@@ -250,20 +250,48 @@ def send_to_slack(message_html):
             print(f"Fallback Slack message also failed: {fallback_error}")
 
 def save_blog_file(title, content_html):
-    """Save the generated blog as HTML in blog folder."""
-    # Ensure BLOG_DIR exists
-    Path(BLOG_DIR).mkdir(parents=True, exist_ok=True)
-
+    """Save the generated blog using GitHub API."""
+    import base64
+    import requests
+    
     date_str = datetime.date.today().strftime("%Y-%m-%d")
-    # Clean title for filename slug
     filename_slug = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
-    if not filename_slug: # Fallback if title becomes empty after sanitization
+    if not filename_slug:
         filename_slug = "untitled-blog-post"
+    
     filename = f"{BLOG_DIR}/{date_str}-{filename_slug}.html"
     
-    with open(filename, "w") as f:
-        f.write(content_html)
-    return filename
+    # Get the current branch name
+    branch = os.environ.get('GITHUB_REF_NAME', 'main')
+    
+    # GitHub API endpoint
+    api_url = f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/contents/{filename}"
+    
+    # Prepare the file content
+    headers = {
+        "Authorization": f"token {os.environ['GITHUB_TOKEN']}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    
+    data = {
+        "message": f"Add blog post: {title}",
+        "content": base64.b64encode(content_html.encode()).decode(),
+        "branch": branch
+    }
+    
+    try:
+        response = requests.put(api_url, headers=headers, json=data)
+        response.raise_for_status()
+        print(f"Blog post created via GitHub API: {filename}")
+        return filename
+    except requests.exceptions.RequestException as e:
+        print(f"GitHub API failed: {e}")
+        # Fallback to local save
+        Path(BLOG_DIR).mkdir(parents=True, exist_ok=True)
+        with open(filename, "w") as f:
+            f.write(content_html)
+        print(f"Blog post saved locally (GitHub API failed): {filename}")
+        return filename
 
 def update_index(title, filename):
     """Add new blog entry to index.html in the blog grid."""

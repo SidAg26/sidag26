@@ -95,36 +95,38 @@ def generate_blog_with_gemini(prompt: str):
 def generate_structured_content(topic):
     """Generate structured content that's easier to format"""
     prompt = f"""
-Generate a blog post about: {topic}
+You are a technical blog writer. Generate a blog post about: {topic}
 
-Return ONLY a JSON object with this structure:
+IMPORTANT: You must return ONLY a valid JSON object. No other text, no explanations, no markdown formatting.
+
+Return this exact JSON structure:
 {{
-    "title": "Blog Title",
-    "description": "Short description of the blog post",
+    "title": "Your Blog Title Here",
+    "description": "A clear, concise description of what this blog post covers",
     "sections": [
         {{
             "heading": "Introduction",
-            "content": "Introduction content with practical examples and insights",
+            "content": "Your introduction content here. Write 2-3 paragraphs explaining the topic and why it matters.",
             "code_examples": []
         }},
         {{
-            "heading": "Main Concepts",
-            "content": "Detailed explanation of main concepts with real-world applications",
-            "code_examples": ["example code 1", "example code 2"]
+            "heading": "Core Concepts",
+            "content": "Explain the main concepts. Use clear examples and practical insights. Write 3-4 paragraphs.",
+            "code_examples": ["// Example code snippet 1", "// Example code snippet 2"]
         }},
         {{
-            "heading": "Best Practices",
-            "content": "Best practices and optimization strategies",
-            "code_examples": ["best practice code example"]
+            "heading": "Implementation Details",
+            "content": "Provide specific implementation guidance. Include best practices and common pitfalls. Write 3-4 paragraphs.",
+            "code_examples": ["// Implementation example", "// Best practice code"]
         }},
         {{
             "heading": "Conclusion",
-            "content": "Summary and future considerations",
+            "content": "Summarize key takeaways and suggest next steps. Write 1-2 paragraphs.",
             "code_examples": []
         }}
     ],
-    "tags": ["tag1", "tag2", "tag3"],
-    "read_time": 5
+    "tags": ["Serverless", "Cloud Computing", "Performance"],
+    "read_time": 8
 }}
 
 Requirements:
@@ -134,6 +136,9 @@ Requirements:
 - Target total content: 800-1500 words
 - Return ONLY valid JSON, no other text
 - Use technical but accessible language
+- Ensure JSON is properly formatted with no syntax errors
+
+Remember: Return ONLY the JSON object, nothing else.
 """
     
     blog_content = None
@@ -145,10 +150,10 @@ Requirements:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a technical blog writer. Always return valid JSON only."},
+                    {"role": "system", "content": "You are a technical blog writer. You must ALWAYS return ONLY valid JSON. Never include markdown, HTML, or any other formatting. Only return the JSON object."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.7
+                temperature=0.3  # Lower temperature for more consistent output
             )
             blog_content = response.choices[0].message.content
             print("OpenAI generation successful.")
@@ -166,6 +171,14 @@ Requirements:
     if not blog_content:
         raise RuntimeError("No AI service available for blog generation.")
     
+    # Clean the response - remove any markdown formatting
+    blog_content = blog_content.strip()
+    if blog_content.startswith('```json'):
+        blog_content = blog_content[7:]
+    if blog_content.endswith('```'):
+        blog_content = blog_content[:-3]
+    blog_content = blog_content.strip()
+    
     # Parse JSON and convert to HTML
     try:
         structured_data = json.loads(blog_content)
@@ -173,25 +186,71 @@ Requirements:
     except json.JSONDecodeError as e:
         print(f"Failed to parse JSON: {e}")
         print("Raw content:", blog_content)
-        # Fallback: treat as plain text
-        return f"<h2>Introduction</h2><p>{blog_content}</p>"
+        # Try to extract JSON from the response
+        json_match = re.search(r'\{.*\}', blog_content, re.DOTALL)
+        if json_match:
+            try:
+                structured_data = json.loads(json_match.group(0))
+                return build_html_from_structure(structured_data)
+            except json.JSONDecodeError:
+                pass
+        # Final fallback: treat as plain text
+        return f"<h2>Introduction</h2><p>Error: Could not parse structured content. Please check the AI generation.</p>"
 
 def build_html_from_structure(structured_content):
     """Build HTML from structured content"""
     html_parts = []
     
-    for section in structured_content.get('sections', []):
-        # Create heading with ID for TOC
-        heading_id = section['heading'].lower().replace(' ', '-').replace('&', 'and')
-        html_parts.append(f'<h2 id="{heading_id}">{section["heading"]}</h2>')
+    # Validate required fields
+    if not isinstance(structured_content, dict):
+        print("❌ Error: structured_content is not a dictionary")
+        return "<h2>Error</h2><p>Invalid content structure</p>"
+    
+    # Get sections, default to empty list if missing
+    sections = structured_content.get('sections', [])
+    if not sections:
+        print("❌ Warning: No sections found in structured content")
+        return "<h2>Introduction</h2><p>Content structure is incomplete</p>"
+    
+    for i, section in enumerate(sections):
+        if not isinstance(section, dict):
+            print(f"❌ Warning: Section {i} is not a dictionary, skipping")
+            continue
+            
+        heading = section.get('heading', f'Section {i+1}')
+        content = section.get('content', 'Content not available')
+        code_examples = section.get('code_examples', [])
         
-        # Add content
-        html_parts.append(f'<p>{section["content"]}</p>')
+        # Create heading with ID for TOC
+        heading_id = re.sub(r'[^a-z0-9]+', '-', heading.lower()).strip('-')
+        if not heading_id:
+            heading_id = f'section-{i+1}'
+        
+        html_parts.append(f'<h2 id="{heading_id}">{heading}</h2>')
+        
+        # Process content - split into paragraphs if it contains newlines
+        if '\n\n' in content:
+            # Split by double newlines and create separate paragraphs
+            paragraphs = content.split('\n\n')
+            for para in paragraphs:
+                para = para.strip()
+                if para:  # Only add non-empty paragraphs
+                    html_parts.append(f'<p>{para}</p>')
+        else:
+            # Single paragraph
+            html_parts.append(f'<p>{content}</p>')
         
         # Add code examples if any
-        if section.get('code_examples'):
-            for code in section['code_examples']:
-                html_parts.append(f'<pre><code>{code}</code></pre>')
+        if code_examples and isinstance(code_examples, list):
+            for code in code_examples:
+                if code and isinstance(code, str):
+                    # Clean the code example
+                    clean_code = code.strip()
+                    if clean_code:
+                        html_parts.append(f'<pre><code>{clean_code}</code></pre>')
+    
+    if not html_parts:
+        return "<h2>Introduction</h2><p>No content could be generated from the structured data.</p>"
     
     return '\n'.join(html_parts)
 
@@ -453,11 +512,13 @@ def update_index(title, filename):
         print(f"Error: {INDEX_FILE} not found. Cannot update index.")
         return
 
-    with open(INDEX_FILE, "r") as f:
+    with open(INDEX_FILE, "r", encoding='utf-8') as f:
         html = f.read()
 
     date_str = datetime.date.today().strftime("%b %d, %Y")
     read_time = "5 min read"  # This can be parsed from AI output if {{READ_TIME}} is filled
+    
+    # Create the new blog card HTML
     post_html = f'''
 <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
     <div class="flex items-center mb-3">
@@ -467,11 +528,12 @@ def update_index(title, filename):
         🚀 {title}
     </h3>
     <p class="text-gray-300 mb-4">
-        Brief intro/summary of the article. (Update after approval if needed)
+        A comprehensive guide about {title.lower()}. Click to read the full article.
     </p>
     <div class="flex flex-wrap gap-2 mb-4">
         <span class="tag">Serverless</span>
-        <span class="tag">Cloud</span>
+        <span class="tag">Cloud Computing</span>
+        <span class="tag">Research</span>
     </div>
     <div class="flex items-center justify-between">
         <span class="text-gray-400 text-sm">📖 {read_time}</span>
@@ -479,50 +541,100 @@ def update_index(title, filename):
             Read Full Article →
         </a>
     </div>
-</div>
-'''
+</div>'''
 
-    # Ensure the placeholder exists before attempting to replace
+    # Check if the placeholder exists
     if "<!-- BLOG-ENTRIES -->" in html:
+        # Replace the placeholder with new post + placeholder
         html = html.replace("<!-- BLOG-ENTRIES -->", post_html + "\n<!-- BLOG-ENTRIES -->")
-        with open(INDEX_FILE, "w") as f:
+        
+        # Write the updated HTML back to the file
+        with open(INDEX_FILE, "w", encoding='utf-8') as f:
             f.write(html)
-        print(f"Updated {INDEX_FILE} with new blog entry.")
+        
+        print(f"✅ Updated {INDEX_FILE} with new blog entry: {title}")
+        print(f"📝 Blog post added to index: {filename}")
     else:
-        print(f"Warning: '<!-- BLOG-ENTRIES -->' placeholder not found in {INDEX_FILE}. Index not updated.")
+        print(f"❌ Warning: '<!-- BLOG-ENTRIES -->' placeholder not found in {INDEX_FILE}")
+        print("🔍 Looking for alternative insertion points...")
+        
+        # Try to find a good place to insert (before the "Coming Soon" card)
+        if "Coming Soon" in html:
+            # Insert before the "Coming Soon" card
+            html = html.replace(
+                '<div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">',
+                post_html + '\n\n<div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">',
+                1  # Only replace the first occurrence (the "Coming Soon" card)
+            )
+            
+            with open(INDEX_FILE, "w", encoding='utf-8') as f:
+                f.write(html)
+            
+            print(f"✅ Updated {INDEX_FILE} by inserting before 'Coming Soon' card")
+        else:
+            print(f"❌ Could not find suitable insertion point in {INDEX_FILE}")
+            print("📋 New blog post HTML (copy manually if needed):")
+            print(post_html)
 
 # ===== Main =====
 if __name__ == "__main__":
+    print("🚀 Starting blog generation process...")
+    
     next_topic_info = get_next_topic()
     if not next_topic_info:
-        print("Exiting: No topics found or topics.md is missing.")
+        print("❌ Exiting: No topics found or topics.md is missing.")
         exit(0)
 
     topic, remaining_topics = next_topic_info
-    print(f"Generating blog for topic: '{topic}'")
+    print(f"📝 Generating blog for topic: '{topic}'")
 
     try:
         # 1. Generate draft HTML
+        print("🔄 Step 1: Generating structured content...")
         blog_html = generate_blog_html(topic)
+        
+        if not blog_html:
+            print("❌ Error: No blog content generated")
+            exit(1)
+        
+        print(f"✅ Content generated successfully. Length: {len(blog_html)} characters")
+        print("📄 Preview of generated content:")
+        print("-" * 50)
+        print(blog_html[:200] + "..." if len(blog_html) > 200 else blog_html)
+        print("-" * 50)
 
-        # 2. Send draft to Slack (this will only work if blog_html is not None)
+        # 2. Send draft to Slack
+        print("\n🔄 Step 2: Sending draft to Slack...")
         if blog_html:
             send_to_slack(blog_html)
         else:
-            print("Skipping Slack notification as no blog content was generated.")
+            print("⚠️ Skipping Slack notification as no blog content was generated.")
 
-        # 3. Save draft locally (this will only work if blog_html is not None)
+        # 3. Save draft locally
+        print("\n🔄 Step 3: Saving draft locally...")
         if blog_html:
             draft_file = save_blog_file(topic, blog_html)
-            print(f"Draft saved to: {draft_file}")
+            print(f"✅ Draft saved to: {draft_file}")
+            
             # 4. Update topics.md
+            print("\n🔄 Step 4: Updating topics file...")
             update_topics_file(remaining_topics)
+            print("✅ Topics file updated")
+            
             # 5. Update blog/index.html
+            print("\n🔄 Step 5: Updating blog index...")
             update_index(topic, draft_file)
+            print("✅ Blog index updated")
+            
+            print(f"\n🎉 Blog generation complete! New post: {draft_file}")
         else:
-            print("Skipping local save and index update as no blog content was generated.")
+            print("❌ Skipping local save and index update as no blog content was generated.")
 
     except RuntimeError as e:
-        print(f"Critical error during blog generation: {e}")
+        print(f"❌ Critical error during blog generation: {e}")
+        exit(1)
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"❌ An unexpected error occurred: {e}")
+        import traceback
+        traceback.print_exc()
+        exit(1)

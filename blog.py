@@ -88,27 +88,27 @@ Return ONLY a valid JSON object with this structure:
         {{
             "heading": "Introduction",
             "content": "Write 3-4 detailed paragraphs introducing the topic, explaining its importance, and setting the context for readers. Make this engaging and informative.",
-            "code_examples": []
+            "code_examples": ["const allocateResources = (demand) => {{ return Math.min(demand * 1.5, MAX_RESOURCES); }};", "const monitorPerformance = () => {{ return {{ latency: measureLatency(), throughput: measureThroughput() }}; }};"]
         }},
         {{
             "heading": "Core Concepts and Fundamentals",
             "content": "Write 4-5 detailed paragraphs explaining the fundamental concepts, principles, and underlying mechanisms. Break down complex ideas into digestible parts with clear explanations.",
-            "code_examples": ["// Detailed code example 1 with comments", "// Detailed code example 2 with explanations"]
+            "code_examples": ["const allocateResources = (demand) => {{ return Math.min(demand * 1.5, MAX_RESOURCES); }};", "const monitorPerformance = () => {{ return {{ latency: measureLatency(), throughput: measureThroughput() }}; }};"]
         }},
         {{
             "heading": "Implementation Strategies and Best Practices",
             "content": "Write 4-5 detailed paragraphs covering practical implementation approaches, common patterns, best practices, and real-world considerations. Include specific guidance and actionable advice.",
-            "code_examples": ["// Best practice implementation with detailed comments", "// Error handling and edge case examples"]
+            "code_examples": ["const isFeatureEnabled = (featureName, userId) => {{ const feature = getFeatureConfig(featureName); return feature.enabled && hashUserId(userId) % 100 < feature.rolloutPercentage; }};", "const handleOperation = async (op) => {{ try {{ const result = await op(); logSuccess(op.name, result); return result; }} catch (error) {{ logError(op.name, error); throw error; }} }};"]
         }},
         {{
             "heading": "Advanced Techniques and Optimization",
             "content": "Write 3-4 detailed paragraphs covering advanced techniques, performance optimization strategies, scalability considerations, and cutting-edge approaches in this field.",
-            "code_examples": ["// Advanced optimization example", "// Performance monitoring and tuning code"]
+            "code_examples": ["const predictScaling = (data) => {{ const patterns = analyzePatterns(data); return applyMLModel(patterns); }};", "const autoRespond = (issue) => {{ const response = determineResponse(issue); if (response.automated) {{ executeResponse(response.action); }} else {{ escalateToHuman(issue); }} }};"]
         }},
         {{
             "heading": "Real-World Applications and Case Studies",
             "content": "Write 3-4 detailed paragraphs discussing real-world applications, industry use cases, success stories, and lessons learned from practical implementations.",
-            "code_examples": ["// Real-world implementation example", "// Case study code snippet"]
+            "code_examples": ["const deployWithRollback = async (version) => {{ const health = await monitorHealth(); if (health.failing > THRESHOLD) {{ await rollback(); return false; }} return true; }};", "const generateDashboard = (metrics) => {{ return {{ status: getStatus(), alerts: getAlerts(), recommendations: generateRecs(metrics) }}; }};"]
         }},
         {{
             "heading": "Conclusion and Future Considerations",
@@ -126,7 +126,10 @@ IMPORTANT:
 - Aim for 15-20 total paragraphs across all sections
 - Include specific, actionable insights and examples
 - Write content that provides real value to readers
-""".format(topic=prompt.split('Generate a blog post about: ')[1].split('\n')[0])
+- For code_examples: Provide actual working code snippets, NOT placeholder comments like "// Example: ..."
+- Code should be real, functional examples that readers can use
+- Avoid generic placeholders - write specific, meaningful code
+"""
         
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
@@ -338,6 +341,49 @@ Remember: Return ONLY the JSON object, nothing else.
         print("⚠️ Using final fallback: plain text conversion")
         return f"<h2>Introduction</h2><p>Error: Could not parse structured content. Please check the AI generation.</p>", f"Understanding {topic}"
 
+def clean_content_content(content):
+    """Clean up content by removing repetitive phrases and improving readability"""
+    if not content:
+        return content
+    
+    # Remove repetitive topic mentions (e.g., "Understanding - Optimizing cold starts in AWS Lambda" repeated multiple times)
+    # This often happens when the AI tries to be too specific in every sentence
+    
+    # Common repetitive patterns to clean up
+    repetitive_patterns = [
+        r'Understanding - ([^,]+) is crucial',
+        r'Understanding - ([^,]+) provides',
+        r'Understanding - ([^,]+) involves',
+        r'Understanding - ([^,]+) requires',
+        r'Understanding - ([^,]+) works',
+        r'Understanding - ([^,]+) extends',
+        r'Understanding - ([^,]+) revolves',
+        r'Understanding - ([^,]+) represents',
+    ]
+    
+    cleaned_content = content
+    for pattern in repetitive_patterns:
+        # Replace repetitive "Understanding - Topic" patterns with more natural language
+        cleaned_content = re.sub(pattern, r'This concept is crucial', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept provides', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept involves', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept requires', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept works', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept extends', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept revolves', cleaned_content)
+        cleaned_content = re.sub(pattern, r'This concept represents', cleaned_content)
+    
+    # Remove excessive dashes and hyphens
+    cleaned_content = re.sub(r' - ([A-Z][a-z]+)', r' \1', cleaned_content)
+    
+    # Clean up multiple spaces
+    cleaned_content = re.sub(r' +', ' ', cleaned_content)
+    
+    # Clean up multiple newlines
+    cleaned_content = re.sub(r'\n{3,}', '\n\n', cleaned_content)
+    
+    return cleaned_content.strip()
+
 def fix_truncated_json(json_string):
     """Attempt to fix common JSON truncation issues"""
     print("🔧 Attempting to fix truncated JSON...")
@@ -452,6 +498,14 @@ def build_html_from_structure(structured_content):
         content = section.get('content', 'Content not available')
         code_examples = section.get('code_examples', [])
         
+        # Clean up the content to remove repetitive phrases and improve readability
+        content = clean_content_content(content)
+        
+        # Skip sections with no meaningful content
+        if not content or content.strip() == 'Content not available' or len(content.strip()) < 10:
+            print(f"⚠️ Skipping section '{heading}' - no meaningful content")
+            continue
+        
         # Create heading with ID for TOC
         heading_id = re.sub(r'[^a-z0-9]+', '-', heading.lower()).strip('-')
         if not heading_id:
@@ -465,20 +519,36 @@ def build_html_from_structure(structured_content):
             paragraphs = content.split('\n\n')
             for para in paragraphs:
                 para = para.strip()
-                if para:  # Only add non-empty paragraphs
+                if para and len(para) > 10:  # Only add non-empty paragraphs with meaningful content
                     html_parts.append(f'<p>{para}</p>')
         else:
-            # Single paragraph
-            html_parts.append(f'<p>{content}</p>')
+            # Single paragraph - only add if it has meaningful content
+            if len(content.strip()) > 10:
+                html_parts.append(f'<p>{content}</p>')
         
-        # Add code examples if any
+        # Add code examples if any - only render non-empty, meaningful code
         if code_examples and isinstance(code_examples, list):
             for code in code_examples:
                 if code and isinstance(code, str):
-                    # Clean the code example
+                    # Clean the code example and check if it's meaningful
                     clean_code = code.strip()
-                    if clean_code:
+                    # Skip code examples that are just comments or placeholders
+                    if (clean_code and 
+                        len(clean_code) > 10 and 
+                        not clean_code.startswith('// Example:') and
+                        not clean_code.startswith('// Basic') and
+                        not clean_code.startswith('// Best practice') and
+                        not clean_code.startswith('// Advanced') and
+                        not clean_code.startswith('// Real-world') and
+                        not clean_code.startswith('// Performance') and
+                        not clean_code.startswith('// Predictive') and
+                        not clean_code.startswith('// Automated') and
+                        not clean_code.startswith('// Production') and
+                        not clean_code.startswith('// Business')):
+                        
                         html_parts.append(f'<pre><code>{clean_code}</code></pre>')
+                    else:
+                        print(f"⚠️ Skipping placeholder code example: {clean_code[:50]}...")
     
     if not html_parts:
         return "<h2>Introduction</h2><p>No content could be generated from the structured data.</p>", actual_title
@@ -502,36 +572,36 @@ def generate_test_blog(topic):
                 "heading": "Core Concepts and Fundamentals",
                 "content": f"At its heart, {topic} revolves around several key principles that govern how systems behave and scale. The first concept to understand is the relationship between resource allocation and performance. When we talk about {topic}, we're essentially discussing how systems allocate and manage resources to meet varying demands.\n\nAnother fundamental aspect is the trade-off between efficiency and reliability. Systems that optimize for {topic} often need to balance these competing concerns, making architectural decisions that prioritize certain characteristics over others. This balancing act requires deep understanding of both the technical constraints and business requirements.\n\nUnderstanding the underlying mechanisms of {topic} involves grasping concepts like resource pooling, dynamic allocation, and adaptive scaling. These mechanisms work together to create systems that can respond intelligently to changing workloads while maintaining performance and reliability standards.\n\nThe relationship between {topic} and system architecture is crucial—the way you design your system directly impacts how effectively you can implement these concepts. This includes considerations around data flow, component coupling, and the overall system topology.",
                 "code_examples": [
-                    "// Example: Basic resource allocation with dynamic scaling\nconst allocateResources = (demand) => {\n  const baseAllocation = demand * 1.5;\n  const maxResources = getMaxAvailableResources();\n  return Math.min(baseAllocation, maxResources);\n};",
-                    "// Example: Performance monitoring with comprehensive metrics\nconst monitorPerformance = () => {\n  return {\n    latency: measureLatency(),\n    throughput: measureThroughput(),\n    resourceUtilization: getResourceUsage(),\n    errorRate: calculateErrorRate(),\n    responseTime: measureResponseTime()\n  };\n};",
-                    "// Example: Configuration management with best practices\nconst getSystemConfig = () => {\n  return {\n    scalingThreshold: process.env.SCALING_THRESHOLD || 0.8,\n    maxInstances: process.env.MAX_INSTANCES || 10,\n    cooldownPeriod: process.env.COOLDOWN_PERIOD || 300\n  };\n};"
+                    "const allocateResources = (demand) => {\n  const baseAllocation = demand * 1.5;\n  const maxResources = getMaxAvailableResources();\n  return Math.min(baseAllocation, maxResources);\n};",
+                    "const monitorPerformance = () => {\n  return {\n    latency: measureLatency(),\n    throughput: measureThroughput(),\n    resourceUtilization: getResourceUsage(),\n    errorRate: calculateErrorRate(),\n    responseTime: measureResponseTime()\n  };\n};",
+                    "const getSystemConfig = () => {\n  return {\n    scalingThreshold: process.env.SCALING_THRESHOLD || 0.8,\n    maxInstances: process.env.MAX_INSTANCES || 10,\n    cooldownPeriod: process.env.COOLDOWN_PERIOD || 300\n  };\n};"
                 ]
             },
             {
                 "heading": "Implementation Strategies and Best Practices",
                 "content": f"Implementing effective {topic} strategies requires a systematic approach that considers multiple factors. Start by establishing clear metrics and monitoring capabilities that will help you understand how your system is performing. This includes setting up logging, metrics collection, and alerting systems that can provide real-time insights into system behavior.\n\nNext, consider implementing gradual rollout strategies that allow you to test changes in production without affecting all users. This might involve feature flags, canary deployments, or A/B testing approaches that minimize risk while maximizing learning opportunities. Remember that successful {topic} implementation is often iterative, requiring continuous monitoring and adjustment based on real-world performance data.\n\nWhen implementing {topic} strategies, it's crucial to consider the operational aspects as well. This includes setting up proper alerting, establishing runbooks for common scenarios, and ensuring your team has the necessary skills and knowledge to operate the system effectively.\n\nAnother key consideration is the integration with existing infrastructure and tools. Your {topic} implementation should work seamlessly with your current monitoring, logging, and deployment systems, rather than requiring a complete overhaul of your existing toolchain.",
                 "code_examples": [
-                    "// Example: Feature flag implementation with gradual rollout\nconst isFeatureEnabled = (featureName, userId) => {\n  const feature = getFeatureConfig(featureName);\n  const userHash = hashUserId(userId);\n  const rolloutPercentage = feature.rolloutPercentage || 0;\n  \n  return feature.enabled && \n         (rolloutPercentage === 100 || \n          userHash % 100 < rolloutPercentage);\n};",
-                    "// Example: Canary deployment with health checks\nconst shouldUseCanary = (request) => {\n  const canaryHeader = request.headers['x-canary'];\n  const randomRoll = Math.random();\n  const canaryPercentage = getCanaryPercentage();\n  \n  return canaryHeader === 'true' || randomRoll < canaryPercentage;\n};",
-                    "// Example: Comprehensive error handling and logging\nconst handleSystemOperation = async (operation) => {\n  try {\n    const startTime = Date.now();\n    const result = await operation();\n    const duration = Date.now() - startTime;\n    \n    logSuccess(operation.name, duration, result);\n    return result;\n  } catch (error) {\n    logError(operation.name, error);\n    throw error;\n  }\n};"
+                    "const isFeatureEnabled = (featureName, userId) => {\n  const feature = getFeatureConfig(featureName);\n  const userHash = hashUserId(userId);\n  const rolloutPercentage = feature.rolloutPercentage || 0;\n  \n  return feature.enabled && \n         (rolloutPercentage === 100 || \n          userHash % 100 < rolloutPercentage);\n};",
+                    "const shouldUseCanary = (request) => {\n  const canaryHeader = request.headers['x-canary'];\n  const randomRoll = Math.random();\n  const canaryPercentage = getCanaryPercentage();\n  \n  return canaryHeader === 'true' || randomRoll < canaryPercentage;\n};",
+                    "const handleSystemOperation = async (operation) => {\n  try {\n    const startTime = Date.now();\n    const result = await operation();\n    const duration = Date.now() - startTime;\n    \n    logSuccess(operation.name, duration, result);\n    return result;\n  } catch (error) {\n    logError(operation.name, error);\n    throw error;\n  }\n};"
                 ]
             },
             {
                 "heading": "Advanced Techniques and Optimization",
                 "content": f"Once you have the basic {topic} implementation in place, you can start exploring advanced techniques and optimization strategies. This includes implementing sophisticated monitoring and alerting systems that can detect issues before they impact users, as well as developing automated response mechanisms that can handle common problems without human intervention.\n\nAdvanced optimization techniques often involve machine learning and predictive analytics. By analyzing historical data and patterns, you can predict when scaling will be needed and proactively allocate resources. This proactive approach can significantly improve system performance and user experience.\n\nPerformance tuning is another critical aspect of advanced {topic} implementation. This involves fine-tuning various parameters, monitoring the impact of changes, and continuously iterating to find the optimal configuration for your specific use case and workload patterns.\n\nScalability considerations become increasingly important as your system grows. Advanced implementations often involve multi-region deployments, load balancing strategies, and sophisticated caching mechanisms that can handle massive scale while maintaining performance.",
                 "code_examples": [
-                    "// Example: Predictive scaling with ML insights\nconst predictScalingNeeds = (historicalData) => {\n  const patterns = analyzeUsagePatterns(historicalData);\n  const predictions = applyMLModel(patterns);\n  return predictions.map(prediction => ({\n    timestamp: prediction.time,\n    expectedLoad: prediction.load,\n    recommendedInstances: prediction.instances\n  }));\n};",
-                    "// Example: Advanced performance monitoring\nconst monitorAdvancedMetrics = () => {\n  return {\n    cpuUtilization: getCPUUsage(),\n    memoryUsage: getMemoryUsage(),\n    networkIO: getNetworkIO(),\n    diskIO: getDiskIO(),\n    customMetrics: getCustomMetrics()\n  };\n};",
-                    "// Example: Automated response system\nconst autoRespondToIssues = (issue) => {\n  const response = determineResponse(issue);\n  if (response.automated) {\n    executeAutomatedResponse(response.action);\n    logAutomatedResponse(issue, response);\n  } else {\n    escalateToHuman(issue, response);\n  }\n};"
+                    "const predictScalingNeeds = (historicalData) => {\n  const patterns = analyzeUsagePatterns(historicalData);\n  const predictions = applyMLModel(patterns);\n  return predictions.map(prediction => ({\n    timestamp: prediction.time,\n    expectedLoad: prediction.load,\n    recommendedInstances: prediction.instances\n  }));\n};",
+                    "const monitorAdvancedMetrics = () => {\n  return {\n    cpuUtilization: getCPUUsage(),\n    memoryUsage: getMemoryUsage(),\n    networkIO: getNetworkIO(),\n    diskIO: getDiskIO(),\n    customMetrics: getCustomMetrics()\n  };\n};",
+                    "const autoRespondToIssues = (issue) => {\n  const response = determineResponse(issue);\n  if (response.automated) {\n    executeAutomatedResponse(response.action);\n    logAutomatedResponse(issue, response);\n  } else {\n    escalateToHuman(issue, response);\n  }\n};"
                 ]
             },
             {
                 "heading": "Real-World Applications and Case Studies",
                 "content": f"Understanding how {topic} works in theory is one thing, but seeing it in action through real-world applications and case studies provides invaluable insights. Many successful companies have implemented sophisticated {topic} strategies that have enabled them to scale their operations while maintaining high performance and reliability.\n\nOne common pattern in successful implementations is the use of gradual rollout strategies combined with comprehensive monitoring. Companies that excel at {topic} often start with small, controlled deployments and gradually expand based on real-world performance data and user feedback.\n\nAnother key lesson from real-world implementations is the importance of team culture and processes. Successful {topic} implementations often involve cross-functional teams that include developers, operations engineers, and business stakeholders working together to ensure that technical decisions align with business objectives.\n\nCase studies also reveal the importance of learning from failures and continuously improving. Even the most successful implementations have encountered challenges, and the key to long-term success is building systems that can learn from these experiences and adapt accordingly.",
                 "code_examples": [
-                    "// Example: Real-world deployment strategy\nconst deployWithRollback = async (version) => {\n  const deployment = await startDeployment(version);\n  const healthChecks = await monitorHealth(deployment.id);\n  \n  if (healthChecks.failing > HEALTH_CHECK_THRESHOLD) {\n    await rollbackDeployment(deployment.id);\n    notifyTeam('Deployment rolled back due to health check failures');\n    return false;\n  }\n  \n  return true;\n};",
-                    "// Example: Production monitoring dashboard\nconst generateDashboard = (metrics) => {\n  return {\n    currentStatus: getSystemStatus(),\n    performanceMetrics: getPerformanceMetrics(),\n    alerts: getActiveAlerts(),\n    recommendations: generateRecommendations(metrics)\n  };\n};",
-                    "// Example: Business impact tracking\nconst trackBusinessImpact = (technicalMetrics) => {\n  return {\n    userExperience: calculateUserExperienceScore(technicalMetrics),\n    businessMetrics: getBusinessMetrics(),\n    correlation: analyzeCorrelation(technicalMetrics, businessMetrics)\n  };\n};"
+                    "const deployWithRollback = async (version) => {\n  const deployment = await startDeployment(version);\n  const healthChecks = await monitorHealth(deployment.id);\n  \n  if (healthChecks.failing > HEALTH_CHECK_THRESHOLD) {\n    await rollbackDeployment(deployment.id);\n    notifyTeam('Deployment rolled back due to health check failures');\n    return false;\n  }\n  \n  return true;\n};",
+                    "const generateDashboard = (metrics) => {\n  return {\n    currentStatus: getSystemStatus(),\n    performanceMetrics: getPerformanceMetrics(),\n    alerts: getActiveAlerts(),\n    recommendations: generateRecommendations(metrics)\n  };\n};",
+                    "const trackBusinessImpact = (technicalMetrics) => {\n  return {\n    userExperience: calculateUserExperienceScore(technicalMetrics),\n    businessMetrics: getBusinessMetrics(),\n    correlation: analyzeCorrelation(technicalMetrics, businessMetrics)\n  };\n};"
                 ]
             },
             {

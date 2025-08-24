@@ -77,8 +77,8 @@ def generate_blog_with_gemini(prompt: str):
         print("🔑 Using Gemini API key:", GEMINI_API_KEY[:10] + "..." if GEMINI_API_KEY else "None")
         
         # Create a more concise prompt for Gemini to avoid truncation
-        concise_prompt = f"""
-Generate a blog post about: {prompt.split('Generate a blog post about: ')[1].split('\n')[0]}
+        concise_prompt = """
+Generate a blog post about: {topic}
 
 Return ONLY a valid JSON object with this structure:
 {{
@@ -111,7 +111,7 @@ Return ONLY a valid JSON object with this structure:
 }}
 
 IMPORTANT: Return ONLY valid JSON, no other text. Keep content concise to avoid truncation.
-"""
+""".format(topic=prompt.split('Generate a blog post about: ')[1].split('\n')[0])
         
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(

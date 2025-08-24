@@ -8,13 +8,14 @@ on:
     branches:
       - '**'  # All branches
     paths:
-      - 'blog/**'
+      # - 'blog/**'
       - '.github/workflows/blog.yml'
+      - 'blog.py'
   pull_request:
     branches:
       - '**'  # All branches
     paths:
-      - 'blog/**'
+      # - 'blog/**'
       - '.github/workflows/blog.yml'
 
 # Add permissions for git operations
@@ -29,9 +30,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Full history for git operations
 
       - name: Setup Python
         uses: actions/setup-python@v4

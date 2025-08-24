@@ -1,17 +1,17 @@
 import os
 import datetime
 import re
-from pathlib import Path
 import requests
+from pathlib import Path
 
-# ===== Optional AI clients =====
+# ===== AI imports =====
 try:
     from openai import OpenAI
 except ImportError:
     OpenAI = None
 
 try:
-    from google import generativeai as genai
+    import google.generativeai as genai
 except ImportError:
     genai = None
 
@@ -22,13 +22,13 @@ INDEX_FILE = "blog/index.html"
 TOPICS_FILE = "blog/topics.md"
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL")
 
-if OpenAI and OPENAI_API_KEY:
-    client_openai = OpenAI(api_key=OPENAI_API_KEY)
-
-if genai and GEMINI_API_KEY:
+# OpenAI client
+client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
+# Gemini client configuration
+if GEMINI_API_KEY and genai:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # ===== Functions =====
@@ -47,60 +47,59 @@ def update_topics_file(remaining_topics):
         for topic in remaining_topics:
             f.write(topic + "\n")
 
-def generate_blog_html_openai(topic):
-    """Generate blog content via OpenAI"""
-    prompt = f"""
-Write a detailed technical blog in HTML format for the topic:
-
-Topic: {topic}
-
-Follow TEMPLATE.html placeholders exactly:
-{{TITLE}}, {{DESCRIPTION}}, {{CONTENT}}, {{TAGS}}, {{DATE}}, {{READ_TIME}}, {{CATEGORY}}, {{TOC}}
-"""
+def generate_blog_with_gemini(prompt: str):
+    """Fallback to Gemini AI"""
     try:
-        response = client_openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a technical blog writer."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
+        client = genai.TextGenerationClient()
+        response = client.generate(
+            model="gemini-1.5-t",
+            prompt=prompt,
+            temperature=0.7,
+            max_output_tokens=2000
         )
-        return response.choices[0].message.content
+        return response.candidates[0].output
     except Exception as e:
-        print(f"OpenAI failed: {e}")
-        return None
-
-def generate_blog_html_gemini(topic):
-    """Generate blog content via Gemini"""
-    try:
-        response = genai.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=f"""
-Write a detailed technical blog in HTML format for the topic:
-
-Topic: {topic}
-
-Follow TEMPLATE.html placeholders exactly:
-{{TITLE}}, {{DESCRIPTION}}, {{CONTENT}}, {{TAGS}}, {{DATE}}, {{READ_TIME}}, {{CATEGORY}}, {{TOC}}
-"""
-        )
-        return response.text
-    except Exception as e:
-        print(f"Gemini failed: {e}")
+        print("Gemini failed:", e)
         return None
 
 def generate_blog_html(topic):
     """Try OpenAI first, fallback to Gemini"""
-    html = None
-    if OpenAI and OPENAI_API_KEY:
-        html = generate_blog_html_openai(topic)
-    if not html and genai and GEMINI_API_KEY:
-        print("Falling back to Gemini...")
-        html = generate_blog_html_gemini(topic)
-    if not html:
-        raise RuntimeError("No AI service available for blog generation.")
-    return html
+    prompt = f"""
+Write a detailed technical blog in HTML format for the following topic:
+
+Topic: {topic}
+
+Follow TEMPLATE.html placeholders exactly:
+{{TITLE}}: Blog title
+{{DESCRIPTION}}: Short description/intro
+{{CONTENT}}: Main HTML content (<h2>, <h3>, <p>, <ul>, <ol>, <code>, <pre> etc.)
+{{TAGS}}: HTML span tags for tags
+{{DATE}}: Today’s date in Month Day, Year format
+{{READ_TIME}}: Approx. read time in minutes
+{{CATEGORY}}: Blog category
+{{TOC}}: Table of contents in <ul><li><a href="#section">Section</a></li></ul>
+"""
+    # Try OpenAI
+    if client:
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "system", "content": "You are a technical blog writer."},
+                          {"role": "user", "content": prompt}],
+                temperature=0.7
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print("OpenAI failed:", e)
+            print("Falling back to Gemini...")
+
+    # Fallback to Gemini
+    if GEMINI_API_KEY and genai:
+        gemini_result = generate_blog_with_gemini(prompt)
+        if gemini_result:
+            return gemini_result
+
+    raise RuntimeError("No AI service available for blog generation.")
 
 def send_to_slack(message_html):
     """Send draft to Slack"""
@@ -131,7 +130,7 @@ def update_index(title, filename):
         html = f.read()
 
     date_str = datetime.date.today().strftime("%b %d, %Y")
-    read_time = "5 min read"
+    read_time = "5 min read"  # optional; can parse from AI output
     post_html = f'''
 <div class="blog-card rounded-xl p-6 border border-gray-800 card-hover">
     <div class="flex items-center mb-3">
@@ -155,6 +154,7 @@ def update_index(title, filename):
     </div>
 </div>
 '''
+
     html = html.replace("<!-- BLOG-ENTRIES -->", post_html + "\n<!-- BLOG-ENTRIES -->")
     with open(INDEX_FILE, "w") as f:
         f.write(html)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
     topic, remaining_topics = next_topic_info
 
-    # 1. Generate draft HTML using OpenAI or Gemini fallback
+    # 1. Generate draft HTML
     blog_html = generate_blog_html(topic)
 
     # 2. Send draft to Slack

@@ -76,49 +76,66 @@ def generate_blog_with_gemini(prompt: str):
     try:
         print("🔑 Using Gemini API key:", GEMINI_API_KEY[:10] + "..." if GEMINI_API_KEY else "None")
         
-        # Create a more concise prompt for Gemini to avoid truncation
-        concise_prompt = """
-Generate a blog post about: {topic}
+        # Create a more comprehensive prompt for Gemini to generate detailed content
+        comprehensive_prompt = f"""
+Generate a comprehensive, detailed blog post about: {topic}
 
 Return ONLY a valid JSON object with this structure:
 {{
-    "title": "Blog Title",
-    "description": "Short description",
+    "title": "Detailed Blog Title",
+    "description": "Comprehensive description of what this blog post covers",
     "sections": [
         {{
             "heading": "Introduction",
-            "content": "1 paragraph about the topic",
+            "content": "Write 3-4 detailed paragraphs introducing the topic, explaining its importance, and setting the context for readers. Make this engaging and informative.",
             "code_examples": []
         }},
         {{
-            "heading": "Core Concepts",
-            "content": "1-2 paragraphs explaining main concepts",
-            "code_examples": ["// Example code 1", "// Example code 2"]
+            "heading": "Core Concepts and Fundamentals",
+            "content": "Write 4-5 detailed paragraphs explaining the fundamental concepts, principles, and underlying mechanisms. Break down complex ideas into digestible parts with clear explanations.",
+            "code_examples": ["// Detailed code example 1 with comments", "// Detailed code example 2 with explanations"]
         }},
         {{
-            "heading": "Best Practices",
-            "content": "1-2 paragraph with implementation guidance",
-            "code_examples": ["// Best practice example"]
+            "heading": "Implementation Strategies and Best Practices",
+            "content": "Write 4-5 detailed paragraphs covering practical implementation approaches, common patterns, best practices, and real-world considerations. Include specific guidance and actionable advice.",
+            "code_examples": ["// Best practice implementation with detailed comments", "// Error handling and edge case examples"]
         }},
         {{
-            "heading": "Conclusion",
-            "content": "1 paragraph summarizing key points",
+            "heading": "Advanced Techniques and Optimization",
+            "content": "Write 3-4 detailed paragraphs covering advanced techniques, performance optimization strategies, scalability considerations, and cutting-edge approaches in this field.",
+            "code_examples": ["// Advanced optimization example", "// Performance monitoring and tuning code"]
+        }},
+        {{
+            "heading": "Real-World Applications and Case Studies",
+            "content": "Write 3-4 detailed paragraphs discussing real-world applications, industry use cases, success stories, and lessons learned from practical implementations.",
+            "code_examples": ["// Real-world implementation example", "// Case study code snippet"]
+        }},
+        {{
+            "heading": "Conclusion and Future Considerations",
+            "content": "Write 2-3 detailed paragraphs summarizing key takeaways, discussing future trends, and providing guidance on next steps for readers.",
             "code_examples": []
         }}
     ],
-    "tags": ["Serverless", "Cloud Computing"],
-    "read_time": 5
+    "tags": ["Serverless", "Cloud Computing", "Performance", "Architecture", "Best Practices"],
+    "read_time": 12
 }}
 
-IMPORTANT: Return ONLY valid JSON, no other text. Keep content concise to avoid truncation.
+IMPORTANT: 
+- Return ONLY valid JSON, no other text
+- Make each section comprehensive and detailed
+- Aim for 15-20 total paragraphs across all sections
+- Include specific, actionable insights and examples
+- Write content that provides real value to readers
 """.format(topic=prompt.split('Generate a blog post about: ')[1].split('\n')[0])
         
         model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
         response = model.generate_content(
-            concise_prompt,
+            comprehensive_prompt,
             generation_config=GenerationConfig(
-                temperature=0.3,
-                max_output_tokens=4000  # Increased token limit
+                temperature=0.4,  # Slightly higher for more creative content
+                max_output_tokens=8000,  # Significantly increased token limit
+                top_p=0.9,  # Add top_p for better content diversity
+                top_k=40    # Add top_k for better content selection
             )
         )
         
@@ -147,48 +164,60 @@ IMPORTANT: Return ONLY valid JSON, no other text. Keep content concise to avoid 
 def generate_structured_content(topic):
     """Generate structured content that's easier to format"""
     prompt = f"""
-You are a technical blog writer. Generate a blog post about: {topic}
+You are a technical blog writer. Generate a comprehensive, detailed blog post about: {topic}
 
 IMPORTANT: You must return ONLY a valid JSON object. No other text, no explanations, no markdown formatting.
 
 Return this exact JSON structure:
 {{
-    "title": "Your Blog Title Here",
-    "description": "A clear, concise description of what this blog post covers",
+    "title": "Your Comprehensive Blog Title Here",
+    "description": "A detailed description of what this blog post covers and what readers will learn",
     "sections": [
         {{
             "heading": "Introduction",
-            "content": "Your introduction content here. Write 2-3 paragraphs explaining the topic and why it matters.",
+            "content": "Write 3-4 detailed paragraphs introducing the topic, explaining its importance in modern cloud computing, and setting the context for readers. Make this engaging and informative.",
             "code_examples": []
         }},
         {{
-            "heading": "Core Concepts",
-            "content": "Explain the main concepts. Use clear examples and practical insights. Write 3-4 paragraphs.",
-            "code_examples": ["// Example code snippet 1", "// Example code snippet 2"]
+            "heading": "Core Concepts and Fundamentals",
+            "content": "Write 4-5 detailed paragraphs explaining the fundamental concepts, principles, and underlying mechanisms. Break down complex ideas into digestible parts with clear explanations and examples.",
+            "code_examples": ["// Detailed code example 1 with comprehensive comments", "// Detailed code example 2 with explanations", "// Configuration example with best practices"]
         }},
         {{
-            "heading": "Implementation Details",
-            "content": "Provide specific implementation guidance. Include best practices and common pitfalls. Write 3-4 paragraphs.",
-            "code_examples": ["// Implementation example", "// Best practice code"]
+            "heading": "Implementation Strategies and Best Practices",
+            "content": "Write 4-5 detailed paragraphs covering practical implementation approaches, common patterns, best practices, and real-world considerations. Include specific guidance and actionable advice.",
+            "code_examples": ["// Best practice implementation with detailed comments", "// Error handling and edge case examples", "// Performance optimization code"]
         }},
         {{
-            "heading": "Conclusion",
-            "content": "Summarize key takeaways and suggest next steps. Write 1-2 paragraphs.",
+            "heading": "Advanced Techniques and Optimization",
+            "content": "Write 3-4 detailed paragraphs covering advanced techniques, performance optimization strategies, scalability considerations, and cutting-edge approaches in this field.",
+            "code_examples": ["// Advanced optimization example", "// Performance monitoring and tuning code", "// Scalability implementation"]
+        }},
+        {{
+            "heading": "Real-World Applications and Case Studies",
+            "content": "Write 3-4 detailed paragraphs discussing real-world applications, industry use cases, success stories, and lessons learned from practical implementations.",
+            "code_examples": ["// Real-world implementation example", "// Case study code snippet", "// Production deployment code"]
+        }},
+        {{
+            "heading": "Conclusion and Future Considerations",
+            "content": "Write 2-3 detailed paragraphs summarizing key takeaways, discussing future trends, and providing guidance on next steps for readers.",
             "code_examples": []
         }}
     ],
-    "tags": ["Serverless", "Cloud Computing", "Performance"],
-    "read_time": 8
+    "tags": ["Serverless", "Cloud Computing", "Performance", "Architecture", "Best Practices"],
+    "read_time": 15
 }}
 
 Requirements:
 - Focus on cloud computing, serverless, or distributed systems
-- Make content informative and engaging
-- Include practical examples where relevant
-- Target total content: 800-1500 words
+- Make content comprehensive, informative, and engaging
+- Include practical examples and code snippets where relevant
+- Target total content: 2000-3000 words across all sections
 - Return ONLY valid JSON, no other text
 - Use technical but accessible language
 - Ensure JSON is properly formatted with no syntax errors
+- Each section should be substantial and provide real value
+- Include specific, actionable insights and implementation guidance
 
 Remember: Return ONLY the JSON object, nothing else.
 """
@@ -225,37 +254,47 @@ Remember: Return ONLY the JSON object, nothing else.
     
     if not blog_content:
         print("❌ Both AI services failed. Creating fallback content...")
-        # Create a simple fallback blog post
+        # Create a comprehensive fallback blog post
         fallback_content = {
-            "title": f"Understanding {topic}",
-            "description": f"A comprehensive guide about {topic} and its importance in modern cloud computing.",
+            "title": f"Understanding {topic}: A Comprehensive Guide",
+            "description": f"A comprehensive guide about {topic} and its importance in modern cloud computing and distributed systems.",
             "sections": [
                 {
                     "heading": "Introduction",
-                    "content": f"This blog post explores the fundamentals of {topic} and why it matters in today's cloud-native world. We'll dive deep into the concepts, implementation strategies, and best practices that can help you build better systems.",
+                    "content": f"This comprehensive blog post explores the fundamentals of {topic} and why it matters in today's cloud-native world. We'll dive deep into the concepts, implementation strategies, and best practices that can help you build better systems.\n\nUnderstanding {topic} is crucial for developers, architects, and DevOps engineers working in modern cloud environments. As organizations continue to adopt cloud-native architectures, the principles behind {topic} provide a foundation for making informed decisions about system design, resource allocation, and performance optimization.\n\nThe importance of {topic} extends beyond just technical implementation—it represents a fundamental shift in how we think about system architecture, resource management, and scalability in the cloud era. Whether you're working with serverless functions, microservices, or traditional cloud infrastructure, grasping these concepts will help you build better systems.",
                     "code_examples": []
                 },
                 {
-                    "heading": "Core Concepts",
-                    "content": f"To understand {topic}, we need to grasp several key concepts. This includes understanding the underlying principles, common patterns, and how it fits into the broader ecosystem of cloud computing and distributed systems.",
-                    "code_examples": ["// Example: Basic implementation", "// Example: Configuration setup"]
+                    "heading": "Core Concepts and Fundamentals",
+                    "content": f"To understand {topic}, we need to grasp several key concepts. This includes understanding the underlying principles, common patterns, and how it fits into the broader ecosystem of cloud computing and distributed systems.\n\nThe fundamental principles of {topic} revolve around resource management, scalability, and performance optimization. These concepts work together to create systems that can efficiently handle varying workloads while maintaining reliability and cost-effectiveness.\n\nUnderstanding the underlying mechanisms involves grasping concepts like dynamic allocation, adaptive scaling, and intelligent resource management. These mechanisms work together to create systems that can respond intelligently to changing demands while maintaining performance standards.\n\nThe relationship between {topic} and system architecture is crucial—the way you design your system directly impacts how effectively you can implement these concepts. This includes considerations around data flow, component coupling, and the overall system topology.",
+                    "code_examples": ["// Example: Basic resource allocation with dynamic scaling", "// Example: Configuration management with best practices", "// Example: Performance monitoring with comprehensive metrics"]
                 },
                 {
-                    "heading": "Implementation Details",
-                    "content": f"Implementing {topic} requires careful consideration of several factors. We'll explore practical approaches, common pitfalls to avoid, and strategies for ensuring your implementation is robust and scalable.",
-                    "code_examples": ["// Best practice implementation", "// Error handling example"]
+                    "heading": "Implementation Strategies and Best Practices",
+                    "content": f"Implementing {topic} requires careful consideration of several factors. We'll explore practical approaches, common pitfalls to avoid, and strategies for ensuring your implementation is robust and scalable.\n\nStart by establishing clear metrics and monitoring capabilities that will help you understand how your system is performing. This includes setting up logging, metrics collection, and alerting systems that can provide real-time insights into system behavior.\n\nNext, consider implementing gradual rollout strategies that allow you to test changes in production without affecting all users. This might involve feature flags, canary deployments, or A/B testing approaches that minimize risk while maximizing learning opportunities.\n\nWhen implementing {topic} strategies, it's crucial to consider the operational aspects as well. This includes setting up proper alerting, establishing runbooks for common scenarios, and ensuring your team has the necessary skills and knowledge to operate the system effectively.",
+                    "code_examples": ["// Best practice implementation with comprehensive error handling", "// Feature flag implementation with gradual rollout", "// Canary deployment with health checks"]
                 },
                 {
-                    "heading": "Conclusion",
-                    "content": f"Understanding {topic} is crucial for building modern, scalable cloud applications. By following the principles and practices outlined in this post, you'll be better equipped to tackle the challenges of cloud-native development.",
+                    "heading": "Advanced Techniques and Optimization",
+                    "content": f"Once you have the basic {topic} implementation in place, you can start exploring advanced techniques and optimization strategies. This includes implementing sophisticated monitoring and alerting systems that can detect issues before they impact users.\n\nAdvanced optimization techniques often involve machine learning and predictive analytics. By analyzing historical data and patterns, you can predict when scaling will be needed and proactively allocate resources. This proactive approach can significantly improve system performance and user experience.\n\nPerformance tuning is another critical aspect of advanced {topic} implementation. This involves fine-tuning various parameters, monitoring the impact of changes, and continuously iterating to find the optimal configuration for your specific use case and workload patterns.\n\nScalability considerations become increasingly important as your system grows. Advanced implementations often involve multi-region deployments, load balancing strategies, and sophisticated caching mechanisms that can handle massive scale while maintaining performance.",
+                    "code_examples": ["// Advanced performance monitoring with ML insights", "// Predictive scaling with historical data analysis", "// Automated response system for common issues"]
+                },
+                {
+                    "heading": "Real-World Applications and Case Studies",
+                    "content": f"Understanding how {topic} works in theory is one thing, but seeing it in action through real-world applications and case studies provides invaluable insights. Many successful companies have implemented sophisticated {topic} strategies that have enabled them to scale their operations while maintaining high performance and reliability.\n\nOne common pattern in successful implementations is the use of gradual rollout strategies combined with comprehensive monitoring. Companies that excel at {topic} often start with small, controlled deployments and gradually expand based on real-world performance data and user feedback.\n\nAnother key lesson from real-world implementations is the importance of team culture and processes. Successful {topic} implementations often involve cross-functional teams that include developers, operations engineers, and business stakeholders working together to ensure that technical decisions align with business objectives.\n\nCase studies also reveal the importance of learning from failures and continuously improving. Even the most successful implementations have encountered challenges, and the key to long-term success is building systems that can learn from these experiences and adapt accordingly.",
+                    "code_examples": ["// Real-world deployment strategy with rollback capability", "// Production monitoring dashboard with business metrics", "// Business impact tracking and correlation analysis"]
+                },
+                {
+                    "heading": "Conclusion and Future Considerations",
+                    "content": f"Understanding {topic} is crucial for building modern, scalable cloud applications. By following the principles and practices outlined in this post, you'll be better equipped to tackle the challenges of cloud-native development.\n\nAs we've explored throughout this comprehensive post, understanding {topic} is fundamental to building modern, scalable cloud systems. The concepts and strategies we've discussed provide a solid foundation for making architectural decisions that balance performance, reliability, and cost-effectiveness.\n\nLooking forward, the landscape of {topic} will continue to evolve as new technologies and approaches emerge. Staying current with these developments, while maintaining focus on fundamental principles, will be key to building systems that can adapt to changing requirements and scale with your organization's growth.",
                     "code_examples": []
                 }
             ],
-            "tags": ["Cloud Computing", "Research", "Best Practices"],
-            "read_time": 5
+            "tags": ["Cloud Computing", "Research", "Best Practices", "Architecture", "Performance"],
+            "read_time": 15
         }
         
-        print("✅ Generated fallback content structure")
+        print("✅ Generated comprehensive fallback content structure")
         return build_html_from_structure(fallback_content)
     
     # Clean the response - remove any markdown formatting
@@ -452,37 +491,57 @@ def generate_test_blog(topic):
     
     test_content = {
         "title": f"Understanding {topic}: A Comprehensive Guide",
-        "description": f"This blog post explores the fundamentals of {topic} and its importance in modern cloud computing and distributed systems.",
+        "description": f"This comprehensive blog post explores the fundamentals of {topic} and its importance in modern cloud computing and distributed systems, providing actionable insights and implementation strategies.",
         "sections": [
             {
                 "heading": "Introduction",
-                "content": f"In today's rapidly evolving cloud computing landscape, understanding {topic} has become increasingly important for developers, architects, and DevOps engineers. This concept plays a crucial role in building scalable, reliable, and cost-effective systems that can handle the demands of modern applications.\n\nAs organizations continue to adopt cloud-native architectures, the principles behind {topic} provide a foundation for making informed decisions about system design, resource allocation, and performance optimization. Whether you're working with serverless functions, microservices, or traditional cloud infrastructure, grasping these concepts will help you build better systems.",
+                "content": f"In today's rapidly evolving cloud computing landscape, understanding {topic} has become increasingly important for developers, architects, and DevOps engineers. This concept plays a crucial role in building scalable, reliable, and cost-effective systems that can handle the demands of modern applications.\n\nAs organizations continue to adopt cloud-native architectures, the principles behind {topic} provide a foundation for making informed decisions about system design, resource allocation, and performance optimization. Whether you're working with serverless functions, microservices, or traditional cloud infrastructure, grasping these concepts will help you build better systems.\n\nThe importance of {topic} extends beyond just technical implementation—it represents a fundamental shift in how we think about system architecture, resource management, and scalability in the cloud era. Understanding these principles is essential for anyone looking to build robust, high-performance applications that can scale with business growth.",
                 "code_examples": []
             },
             {
                 "heading": "Core Concepts and Fundamentals",
-                "content": f"At its heart, {topic} revolves around several key principles that govern how systems behave and scale. The first concept to understand is the relationship between resource allocation and performance. When we talk about {topic}, we're essentially discussing how systems allocate and manage resources to meet varying demands.\n\nAnother fundamental aspect is the trade-off between efficiency and reliability. Systems that optimize for {topic} often need to balance these competing concerns, making architectural decisions that prioritize certain characteristics over others. This balancing act requires deep understanding of both the technical constraints and business requirements.",
+                "content": f"At its heart, {topic} revolves around several key principles that govern how systems behave and scale. The first concept to understand is the relationship between resource allocation and performance. When we talk about {topic}, we're essentially discussing how systems allocate and manage resources to meet varying demands.\n\nAnother fundamental aspect is the trade-off between efficiency and reliability. Systems that optimize for {topic} often need to balance these competing concerns, making architectural decisions that prioritize certain characteristics over others. This balancing act requires deep understanding of both the technical constraints and business requirements.\n\nUnderstanding the underlying mechanisms of {topic} involves grasping concepts like resource pooling, dynamic allocation, and adaptive scaling. These mechanisms work together to create systems that can respond intelligently to changing workloads while maintaining performance and reliability standards.\n\nThe relationship between {topic} and system architecture is crucial—the way you design your system directly impacts how effectively you can implement these concepts. This includes considerations around data flow, component coupling, and the overall system topology.",
                 "code_examples": [
-                    "// Example: Basic resource allocation\nconst allocateResources = (demand) => {\n  return Math.min(demand * 1.5, MAX_RESOURCES);\n};",
-                    "// Example: Performance monitoring\nconst monitorPerformance = () => {\n  return {\n    latency: measureLatency(),\n    throughput: measureThroughput(),\n    resourceUtilization: getResourceUsage()\n  };\n};"
+                    "// Example: Basic resource allocation with dynamic scaling\nconst allocateResources = (demand) => {\n  const baseAllocation = demand * 1.5;\n  const maxResources = getMaxAvailableResources();\n  return Math.min(baseAllocation, maxResources);\n};",
+                    "// Example: Performance monitoring with comprehensive metrics\nconst monitorPerformance = () => {\n  return {\n    latency: measureLatency(),\n    throughput: measureThroughput(),\n    resourceUtilization: getResourceUsage(),\n    errorRate: calculateErrorRate(),\n    responseTime: measureResponseTime()\n  };\n};",
+                    "// Example: Configuration management with best practices\nconst getSystemConfig = () => {\n  return {\n    scalingThreshold: process.env.SCALING_THRESHOLD || 0.8,\n    maxInstances: process.env.MAX_INSTANCES || 10,\n    cooldownPeriod: process.env.COOLDOWN_PERIOD || 300\n  };\n};"
                 ]
             },
             {
                 "heading": "Implementation Strategies and Best Practices",
-                "content": f"Implementing effective {topic} strategies requires a systematic approach that considers multiple factors. Start by establishing clear metrics and monitoring capabilities that will help you understand how your system is performing. This includes setting up logging, metrics collection, and alerting systems that can provide real-time insights into system behavior.\n\nNext, consider implementing gradual rollout strategies that allow you to test changes in production without affecting all users. This might involve feature flags, canary deployments, or A/B testing approaches that minimize risk while maximizing learning opportunities. Remember that successful {topic} implementation is often iterative, requiring continuous monitoring and adjustment based on real-world performance data.",
+                "content": f"Implementing effective {topic} strategies requires a systematic approach that considers multiple factors. Start by establishing clear metrics and monitoring capabilities that will help you understand how your system is performing. This includes setting up logging, metrics collection, and alerting systems that can provide real-time insights into system behavior.\n\nNext, consider implementing gradual rollout strategies that allow you to test changes in production without affecting all users. This might involve feature flags, canary deployments, or A/B testing approaches that minimize risk while maximizing learning opportunities. Remember that successful {topic} implementation is often iterative, requiring continuous monitoring and adjustment based on real-world performance data.\n\nWhen implementing {topic} strategies, it's crucial to consider the operational aspects as well. This includes setting up proper alerting, establishing runbooks for common scenarios, and ensuring your team has the necessary skills and knowledge to operate the system effectively.\n\nAnother key consideration is the integration with existing infrastructure and tools. Your {topic} implementation should work seamlessly with your current monitoring, logging, and deployment systems, rather than requiring a complete overhaul of your existing toolchain.",
                 "code_examples": [
-                    "// Example: Feature flag implementation\nconst isFeatureEnabled = (featureName, userId) => {\n  const feature = getFeatureConfig(featureName);\n  return feature.enabled && \n         (feature.percentage === 100 || \n          hashUserId(userId) % 100 < feature.percentage);\n};",
-                    "// Example: Canary deployment check\nconst shouldUseCanary = (request) => {\n  return request.headers['x-canary'] === 'true' || \n         Math.random() < CANARY_PERCENTAGE;\n};"
+                    "// Example: Feature flag implementation with gradual rollout\nconst isFeatureEnabled = (featureName, userId) => {\n  const feature = getFeatureConfig(featureName);\n  const userHash = hashUserId(userId);\n  const rolloutPercentage = feature.rolloutPercentage || 0;\n  \n  return feature.enabled && \n         (rolloutPercentage === 100 || \n          userHash % 100 < rolloutPercentage);\n};",
+                    "// Example: Canary deployment with health checks\nconst shouldUseCanary = (request) => {\n  const canaryHeader = request.headers['x-canary'];\n  const randomRoll = Math.random();\n  const canaryPercentage = getCanaryPercentage();\n  \n  return canaryHeader === 'true' || randomRoll < canaryPercentage;\n};",
+                    "// Example: Comprehensive error handling and logging\nconst handleSystemOperation = async (operation) => {\n  try {\n    const startTime = Date.now();\n    const result = await operation();\n    const duration = Date.now() - startTime;\n    \n    logSuccess(operation.name, duration, result);\n    return result;\n  } catch (error) {\n    logError(operation.name, error);\n    throw error;\n  }\n};"
+                ]
+            },
+            {
+                "heading": "Advanced Techniques and Optimization",
+                "content": f"Once you have the basic {topic} implementation in place, you can start exploring advanced techniques and optimization strategies. This includes implementing sophisticated monitoring and alerting systems that can detect issues before they impact users, as well as developing automated response mechanisms that can handle common problems without human intervention.\n\nAdvanced optimization techniques often involve machine learning and predictive analytics. By analyzing historical data and patterns, you can predict when scaling will be needed and proactively allocate resources. This proactive approach can significantly improve system performance and user experience.\n\nPerformance tuning is another critical aspect of advanced {topic} implementation. This involves fine-tuning various parameters, monitoring the impact of changes, and continuously iterating to find the optimal configuration for your specific use case and workload patterns.\n\nScalability considerations become increasingly important as your system grows. Advanced implementations often involve multi-region deployments, load balancing strategies, and sophisticated caching mechanisms that can handle massive scale while maintaining performance.",
+                "code_examples": [
+                    "// Example: Predictive scaling with ML insights\nconst predictScalingNeeds = (historicalData) => {\n  const patterns = analyzeUsagePatterns(historicalData);\n  const predictions = applyMLModel(patterns);\n  return predictions.map(prediction => ({\n    timestamp: prediction.time,\n    expectedLoad: prediction.load,\n    recommendedInstances: prediction.instances\n  }));\n};",
+                    "// Example: Advanced performance monitoring\nconst monitorAdvancedMetrics = () => {\n  return {\n    cpuUtilization: getCPUUsage(),\n    memoryUsage: getMemoryUsage(),\n    networkIO: getNetworkIO(),\n    diskIO: getDiskIO(),\n    customMetrics: getCustomMetrics()\n  };\n};",
+                    "// Example: Automated response system\nconst autoRespondToIssues = (issue) => {\n  const response = determineResponse(issue);\n  if (response.automated) {\n    executeAutomatedResponse(response.action);\n    logAutomatedResponse(issue, response);\n  } else {\n    escalateToHuman(issue, response);\n  }\n};"
+                ]
+            },
+            {
+                "heading": "Real-World Applications and Case Studies",
+                "content": f"Understanding how {topic} works in theory is one thing, but seeing it in action through real-world applications and case studies provides invaluable insights. Many successful companies have implemented sophisticated {topic} strategies that have enabled them to scale their operations while maintaining high performance and reliability.\n\nOne common pattern in successful implementations is the use of gradual rollout strategies combined with comprehensive monitoring. Companies that excel at {topic} often start with small, controlled deployments and gradually expand based on real-world performance data and user feedback.\n\nAnother key lesson from real-world implementations is the importance of team culture and processes. Successful {topic} implementations often involve cross-functional teams that include developers, operations engineers, and business stakeholders working together to ensure that technical decisions align with business objectives.\n\nCase studies also reveal the importance of learning from failures and continuously improving. Even the most successful implementations have encountered challenges, and the key to long-term success is building systems that can learn from these experiences and adapt accordingly.",
+                "code_examples": [
+                    "// Example: Real-world deployment strategy\nconst deployWithRollback = async (version) => {\n  const deployment = await startDeployment(version);\n  const healthChecks = await monitorHealth(deployment.id);\n  \n  if (healthChecks.failing > HEALTH_CHECK_THRESHOLD) {\n    await rollbackDeployment(deployment.id);\n    notifyTeam('Deployment rolled back due to health check failures');\n    return false;\n  }\n  \n  return true;\n};",
+                    "// Example: Production monitoring dashboard\nconst generateDashboard = (metrics) => {\n  return {\n    currentStatus: getSystemStatus(),\n    performanceMetrics: getPerformanceMetrics(),\n    alerts: getActiveAlerts(),\n    recommendations: generateRecommendations(metrics)\n  };\n};",
+                    "// Example: Business impact tracking\nconst trackBusinessImpact = (technicalMetrics) => {\n  return {\n    userExperience: calculateUserExperienceScore(technicalMetrics),\n    businessMetrics: getBusinessMetrics(),\n    correlation: analyzeCorrelation(technicalMetrics, businessMetrics)\n  };\n};"
                 ]
             },
             {
                 "heading": "Conclusion and Future Considerations",
-                "content": f"As we've explored throughout this post, understanding {topic} is fundamental to building modern, scalable cloud systems. The concepts and strategies we've discussed provide a solid foundation for making architectural decisions that balance performance, reliability, and cost-effectiveness.\n\nLooking forward, the landscape of {topic} will continue to evolve as new technologies and approaches emerge. Staying current with these developments, while maintaining focus on fundamental principles, will be key to building systems that can adapt to changing requirements and scale with your organization's growth.",
+                "content": f"As we've explored throughout this comprehensive post, understanding {topic} is fundamental to building modern, scalable cloud systems. The concepts and strategies we've discussed provide a solid foundation for making architectural decisions that balance performance, reliability, and cost-effectiveness.\n\nLooking forward, the landscape of {topic} will continue to evolve as new technologies and approaches emerge. Staying current with these developments, while maintaining focus on fundamental principles, will be key to building systems that can adapt to changing requirements and scale with your organization's growth.\n\nThe future of {topic} likely involves even more sophisticated automation, machine learning integration, and intelligent decision-making systems. As these technologies mature, they will provide new opportunities to optimize system performance and resource utilization in ways that weren't possible before.",
                 "code_examples": []
             }
         ],
-        "tags": ["Cloud Computing", "System Design", "Performance", "Best Practices"],
-        "read_time": 8
+        "tags": ["Cloud Computing", "System Design", "Performance", "Best Practices", "Architecture"],
+        "read_time": 15
     }
     
     print("✅ Test blog content generated successfully")
@@ -709,8 +768,40 @@ def send_to_slack(message_html):
         except Exception as fallback_error:
             print(f"Fallback Slack message also failed: {fallback_error}")
 
+def commit_blog_and_index(blog_file, index_file, title):
+    """Commit both the new blog post and updated index file together"""
+    try:
+        import subprocess
+        
+        # Configure git for the workflow
+        subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"], check=True)
+        
+        # Add both files
+        subprocess.run(["git", "add", blog_file], check=True)
+        subprocess.run(["git", "add", index_file], check=True)
+        
+        # Commit both changes together
+        commit_message = f"Add blog post and update index: {title}"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Push to the current branch
+        subprocess.run(["git", "push"], check=True)
+        
+        print(f"✅ Blog post and index committed and pushed to Git")
+        return True
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Git operations failed: {e}")
+        print("Files saved locally but not committed to Git")
+        return False
+    except Exception as e:
+        print(f"Unexpected error during git operations: {e}")
+        print("Files saved locally but not committed to Git")
+        return False
+
 def save_blog_file(title, content_html):
-    """Save the generated blog as HTML in blog folder and commit to git."""
+    """Save the generated blog as HTML in blog folder."""
     # Ensure BLOG_DIR exists
     Path(BLOG_DIR).mkdir(parents=True, exist_ok=True)
 
@@ -725,32 +816,7 @@ def save_blog_file(title, content_html):
     with open(filename, "w", encoding='utf-8') as f:
         f.write(content_html)
     
-    # Commit and push to git
-    try:
-        import subprocess
-        
-        # Configure git for the workflow
-        subprocess.run(["git", "config", "--global", "user.name", "GitHub Actions"], check=True)
-        subprocess.run(["git", "config", "--global", "user.email", "actions@github.com"], check=True)
-        
-        # Add the new file
-        subprocess.run(["git", "add", filename], check=True)
-        
-        # Commit the changes
-        commit_message = f"Add blog post: {title}"
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        
-        # Push to the current branch
-        subprocess.run(["git", "push"], check=True)
-        
-        print(f"Blog post committed and pushed to git: {filename}")
-        
-    except subprocess.CalledProcessError as e:
-        print(f"Git operations failed: {e}")
-        print("Blog file saved locally but not committed to git")
-    except Exception as e:
-        print(f"Unexpected error during git operations: {e}")
-        print("Blog file saved locally but not committed to git")
+    print(f"Blog post saved locally: {filename}")
     
     return filename
 
@@ -983,8 +1049,15 @@ if __name__ == "__main__":
             update_index(actual_title, draft_file)
             print("✅ Blog index updated")
             
-            # 6. Verify placeholder is preserved
-            print("\n🔄 Step 6: Verifying placeholder preservation...")
+            # 6. Commit both blog post and updated index to Git
+            print("\n🔄 Step 6: Committing blog post and updated index to Git...")
+            if commit_blog_and_index(draft_file, INDEX_FILE, actual_title):
+                print("✅ Both files committed and pushed successfully")
+            else:
+                print("⚠️ Warning: Git commit failed, files only saved locally")
+            
+            # 7. Verify placeholder is preserved
+            print("\n🔄 Step 7: Verifying placeholder preservation...")
             if ensure_placeholder_exists():
                 print("✅ BLOG-ENTRIES placeholder verified and preserved")
             else:

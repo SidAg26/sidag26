@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRe-SCale - Deep Recurrent Reinforcement Learning for Serverless Autoscaling</title>
+    <meta name="description" content="DRe-SCale is a deep recurrent reinforcement learning method for intelligent autoscaling of serverless functions, improving throughput by 18% and function execution by 13%.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="./index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="./index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="./index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="./index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="./index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="fade-in text-center md:text-left">
+                    <div class="inline-flex items-center space-x-2 mb-4">
+                        <span class="text-xl">🧠</span>
+                        <span class="text-primary font-semibold">RL for Autoscaling</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                        DRe-SCale: Intelligent Serverless Autoscaling
+                    </h1>
+                    <p class="text-xl text-secondary mb-8 leading-relaxed">
+                        Revolutionary deep recurrent reinforcement learning method for intelligent autoscaling of serverless functions. Improve throughput by 18% and function execution by 13% through advanced AI-powered scaling.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
+                        <a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="cta-button">
+                            🚀 Get Started
+                        </a>
+                        <a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="social-badge">
+                            📚 View on GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="stats-card p-10 text-center card-hover">
+                        <div class="text-6xl mb-4">📈</div>
+                        <h3 class="text-xl font-bold text-white mb-2">LSTM-PPO Powered Autoscaling</h3>
+                        <p class="text-secondary">Capture temporal patterns with recurrent policies and make robust scaling decisions using PPO—deployed on OpenFaaS.</p>
+                        <div class="mt-6 flex justify-center gap-3">
+                            <span class="feature-badge">Recurrent</span>
+                            <span class="feature-badge">Robust</span>
+                            <span class="feature-badge">Production</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Benefits Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Why Choose DRe-SCale?</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Transform serverless autoscaling from threshold-based guessing to AI-powered intelligent optimization.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Deep Recurrent RL</h3>
+                    <p class="text-secondary">
+                        Advanced LSTM-PPO integration for capturing temporal dependencies and environment dynamics in complex cloud environments.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📈</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Proven Performance</h3>
+                    <p class="text-secondary">
+                        Achieve 18% throughput improvement, 13% function execution enhancement, and 8.4% more function instances.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Intelligent Adaptation</h3>
+                    <p class="text-secondary">
+                        Automatically adapts to fluctuating workloads and performance constraints without manual threshold configuration.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold text-white mb-4">POMDP Modeling</h3>
+                    <p class="text-secondary">
+                        Handles partial observability in dynamic cloud environments through sophisticated decision process modeling.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">☁️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">OpenFaaS Native</h3>
+                    <p class="text-secondary">
+                        Built and tested on OpenFaaS with MicroK8s deployment for production-ready serverless environments.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🔬</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Research-Driven</h3>
+                    <p class="text-secondary">
+                        Published in IEEE Transactions on Services Computing with comprehensive experimental validation.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🏗️ LSTM-PPO Architecture</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Advanced neural network architecture combining recurrent units with reinforcement learning for intelligent autoscaling decisions.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Components</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🧠</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">LSTM Integration</h4>
+                                <p class="text-secondary">Long-Short Term Memory networks for temporal dependency capture</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🎭</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Actor-Critic Networks</h4>
+                                <p class="text-secondary">Dual network architecture with policy and value function learning</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">⚙️</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">PPO Algorithm</h4>
+                                <p class="text-secondary">Proximal Policy Optimization with clipped surrogate objectives</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🔄</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Recurrent Policies</h4>
+                                <p class="text-secondary">Hidden state maintenance for environment memory and adaptation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <div class="mx-auto w-80 h-80 rounded-lg shadow-2xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-primary/20 p-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🏗️</div>
+                            <div class="text-primary font-bold text-xl mb-2">LSTM-PPO Architecture</div>
+                            <div class="text-secondary text-sm leading-relaxed">
+                                <div class="mb-2">🧠 LSTM Layer</div>
+                                <div class="mb-2">🎭 Actor Network</div>
+                                <div class="mb-2">🎯 Critic Network</div>
+                                <div class="mb-2">⚡ PPO Updates</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Results Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">📊 Superior Performance Results</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    DRe-SCale outperforms traditional threshold-based autoscaling across all key metrics.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🚀</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Throughput Improvement</h3>
+                    <p class="text-secondary mb-4">
+                        Achieve 18% better throughput compared to traditional threshold-based autoscaling approaches.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">18% Increase</span>
+                        <span class="tech-badge">Real-time</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Function Execution</h3>
+                    <p class="text-secondary mb-4">
+                        Improve function execution performance by 13% through intelligent resource allocation.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">13% Enhancement</span>
+                        <span class="tech-badge">Efficient</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">📈</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Instance Management</h3>
+                    <p class="text-secondary mb-4">
+                        Manage 8.4% more function instances with optimal resource utilization.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">8.4% More</span>
+                        <span class="tech-badge">Optimized</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🛠️ Technical Implementation</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Built on cutting-edge reinforcement learning and deployed on production-ready cloud infrastructure.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Technologies</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🤖</span>
+                            <span class="text-secondary">Deep Recurrent Reinforcement Learning</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🧠</span>
+                            <span class="text-secondary">LSTM Networks with PPO Algorithm</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🐳</span>
+                            <span class="text-secondary">OpenFaaS on MicroK8s (v1.27.2)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">☁️</span>
+                            <span class="text-secondary">NeCTAR Melbourne Research Cloud</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📊</span>
+                            <span class="text-secondary">Prometheus Monitoring & Metrics</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Advanced Features</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🎯</span>
+                            <span class="text-secondary">POMDP environment modeling</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🔄</span>
+                            <span class="text-secondary">Recurrent policy networks</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">⚖️</span>
+                            <span class="text-secondary">PPO clipped surrogate objectives</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📈</span>
+                            <span class="text-secondary">Real-time autoscaling decisions</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">💾</span>
+                            <span class="text-secondary">Multi-node cluster deployment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Impact Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🔬 Research Impact & Recognition</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    DRe-SCale represents breakthrough research in intelligent serverless autoscaling and reinforcement learning.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Published Research</h3>
+                    <p class="text-secondary mb-4">
+                        Published in IEEE Transactions on Services Computing, a premier journal in cloud computing and services.
+                    </p>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300 mb-2"><strong>Journal:</strong> IEEE Transactions on Services Computing</p>
+                        <p class="text-sm text-gray-300 mb-2"><strong>Year:</strong> 2024</p>
+                        <p class="text-sm text-gray-300 mb-2"><strong>DOI:</strong> 10.1109/TSC.2024.3387661</p>
+                        <p class="text-sm text-gray-300"><strong>Pages:</strong> 1-12</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Key Contributions</h3>
+                    <p class="text-secondary mb-4">
+                        Novel integration of recurrent units with reinforcement learning for serverless autoscaling.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">LSTM-PPO integration</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">POMDP environment modeling</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Production deployment</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Comprehensive evaluation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Ready to Revolutionize Your Serverless Autoscaling?</h2>
+                <p class="text-xl text-secondary mb-8">
+                    Join the future of intelligent serverless management with DRe-SCale. Experience unprecedented performance improvements through deep recurrent reinforcement learning.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="cta-button">
+                        🚀 Get Started Today
+                    </a>
+                    <a href="./blog/index.html" class="social-badge">
+                        📚 Read Our Blog
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">DRe-SCale Platform</h3>
+                    <p class="text-gray-400 text-sm">
+                        Deep recurrent reinforcement learning method for intelligent autoscaling of serverless functions, delivering superior performance and resource optimization.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./blog/index.html" class="text-gray-400 hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. DRe-SCale - Deep Recurrent Reinforcement Learning for Serverless Autoscaling</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

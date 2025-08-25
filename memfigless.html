@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemFigLess - Input-Aware Memory Configuration for Serverless Functions</title>
+    <meta name="description" content="MemFigLess is an input-aware ensemble-learning method for dynamic memory configuration of serverless computing functions, reducing resource wastage by up to 82% and saving costs by up to 87%.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="./index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="./index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="./index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="./index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="./index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="fade-in text-center md:text-left">
+                    <div class="inline-flex items-center space-x-2 mb-4">
+                        <span class="text-xl">🧠</span>
+                        <span class="text-primary font-semibold">Input-Aware Optimization</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                        MemFigLess: Input-Aware Memory Configuration
+                    </h1>
+                    <p class="text-xl text-secondary mb-8 leading-relaxed">
+                        Revolutionary ensemble-learning method for dynamic memory configuration of serverless computing functions. Reduce resource wastage by up to 82% and save costs by up to 87% through input-aware optimization.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
+                        <a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="cta-button">
+                            🚀 Get Started
+                        </a>
+                        <a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="social-badge">
+                            📚 View on GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="stats-card p-10 text-center card-hover">
+                        <div class="text-6xl mb-4">🧮</div>
+                        <h3 class="text-xl font-bold text-white mb-2">Input-Aware Memory Tuning</h3>
+                        <p class="text-secondary">Predict optimal memory from request features using ensemble learning; enforce constraints and persist outcomes for continuous improvement.</p>
+                        <div class="mt-6 flex justify-center gap-3">
+                            <span class="feature-badge">Predictive</span>
+                            <span class="feature-badge">Cost-Saving</span>
+                            <span class="feature-badge">AWS-Native</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Benefits Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Why Choose MemFigLess?</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Transform serverless function configuration from speculation to science with AI-powered input-aware memory optimization.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold text-white mb-4">AI-Powered Optimization</h3>
+                    <p class="text-secondary">
+                        Multi-output Random Forest Regression model that learns input-aware resource relationships for optimal memory configuration.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">💰</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Massive Cost Savings</h3>
+                    <p class="text-secondary">
+                        Reduce resource wastage by up to 82% and save run-time costs by up to 87% compared to traditional approaches.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Input-Aware Intelligence</h3>
+                    <p class="text-secondary">
+                        Automatically detects correlations between function payload, execution time, and memory requirements for precise optimization.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🏗️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">MAPE Control Loop</h3>
+                    <p class="text-secondary">
+                        Monitor, Analyze, Plan, and Execute framework for continuous optimization and performance improvement.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">☁️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">AWS Native</h3>
+                    <p class="text-secondary">
+                        Built on AWS Serverless Suite with Lambda, DynamoDB, Step Functions, and S3 for seamless integration.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Proven Results</h3>
+                    <p class="text-secondary">
+                        Evaluated against COSE, Parrotfish, and AWS Power Tuning with superior performance across multiple benchmarks.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🏗️ MAPE Control Loop Architecture</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    MemFigLess implements a sophisticated MAPE (Monitor, Analyze, Plan, Execute) control loop for continuous optimization.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">System Components</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">📊</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Offline Training Module</h4>
+                                <p class="text-secondary">Function profiling, data collection, and Random Forest model training</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🔮</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Online Prediction Module</h4>
+                                <p class="text-secondary">Real-time memory estimation and constraint optimization</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">⚙️</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Dynamic Resource Manager</h4>
+                                <p class="text-secondary">Resource allocation, monitoring, and feedback loop management</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🔄</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Continuous Learning</h4>
+                                <p class="text-secondary">Periodic model retraining and performance improvement</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <div class="mx-auto w-80 h-80 rounded-lg shadow-2xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-primary/20 p-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🏗️</div>
+                            <div class="text-primary font-bold text-xl mb-2">MAPE Architecture</div>
+                            <div class="text-secondary text-sm leading-relaxed">
+                                <div class="mb-2">📊 Monitor</div>
+                                <div class="mb-2">🔍 Analyze</div>
+                                <div class="mb-2">📋 Plan</div>
+                                <div class="mb-2">⚡ Execute</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Results Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">📊 Proven Performance Results</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    MemFigLess delivers exceptional results across diverse serverless functions and workloads.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🧮</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Mathematical Functions</h3>
+                    <p class="text-secondary mb-4">
+                        Matrix multiplication, linear algebra, and cryptographic operations with up to 73% resource savings.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">matmul</span>
+                        <span class="tech-badge">linpack</span>
+                        <span class="tech-badge">pyaes</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🌐</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Graph Algorithms</h3>
+                    <p class="text-secondary mb-4">
+                        Graph processing functions achieving up to 87% cost efficiency and 75% resource optimization.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">graph-mst</span>
+                        <span class="tech-badge">graph-bfs</span>
+                        <span class="tech-badge">pagerank</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🌐</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Web Generation</h3>
+                    <p class="text-secondary mb-4">
+                        Dynamic website generation and HTML processing with significant performance improvements.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">chameleon</span>
+                        <span class="tech-badge">dynamic-html</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🛠️ Technical Implementation</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Built on AWS Serverless Suite with advanced machine learning and optimization algorithms.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Technologies</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🤖</span>
+                            <span class="text-secondary">Random Forest Regression (Scikit-Learn)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">☁️</span>
+                            <span class="text-secondary">AWS Lambda & Step Functions</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🗄️</span>
+                            <span class="text-secondary">AWS DynamoDB & S3</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📊</span>
+                            <span class="text-secondary">AWS CloudWatch Monitoring</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🐍</span>
+                            <span class="text-secondary">Python 3.12 Implementation</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Advanced Features</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🎯</span>
+                            <span class="text-secondary">Input-aware resource estimation</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">⚖️</span>
+                            <span class="text-secondary">Constraint optimization</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🔄</span>
+                            <span class="text-secondary">Continuous model retraining</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📈</span>
+                            <span class="text-secondary">Performance monitoring</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">💾</span>
+                            <span class="text-secondary">Automated workflow execution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Impact Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🔬 Research Impact & Recognition</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    MemFigLess represents cutting-edge research in serverless computing optimization and resource management.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Published Research</h3>
+                    <p class="text-secondary mb-4">
+                        Presented at UCC '24 - The Seventeenth International Conference on Utility and Cloud Computing in Sharjah, UAE.
+                    </p>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <p class="text-sm text-gray-300 mb-2"><strong>Conference:</strong> UCC '24</p>
+                        <p class="text-sm text-gray-300 mb-2"><strong>Location:</strong> Sharjah, UAE</p>
+                        <p class="text-sm text-gray-300 mb-2"><strong>Pages:</strong> 346-355</p>
+                        <p class="text-sm text-gray-300"><strong>Publisher:</strong> IEEE CS Press</p>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Key Contributions</h3>
+                    <p class="text-secondary mb-4">
+                        Novel approach to input-aware serverless function configuration with proven cost and performance benefits.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Input-aware resource optimization</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Multi-objective constraint solving</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Real-world AWS deployment</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">✓</span>
+                            <span class="text-sm text-secondary">Comprehensive benchmarking</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Ready to Optimize Your Serverless Functions?</h2>
+                <p class="text-xl text-secondary mb-8">
+                    Join the future of intelligent serverless optimization with MemFigLess. Experience unprecedented cost savings and performance improvements through AI-powered memory configuration.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="cta-button">
+                        🚀 Get Started Today
+                    </a>
+                    <a href="./blog/index.html" class="social-badge">
+                        📚 Read Our Blog
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">MemFigLess Platform</h3>
+                    <p class="text-gray-400 text-sm">
+                        Input-aware ensemble-learning method for dynamic memory configuration of serverless computing functions, reducing resource wastage and optimizing costs.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./blog/index.html" class="text-gray-400 hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. MemFigLess - Input-Aware Memory Configuration for Serverless Functions</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

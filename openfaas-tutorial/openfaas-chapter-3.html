@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: API Definition - OpenFaaS Tutorial</title>
+    <meta name="description" content="Learn where the OpenFaaS REST API is defined and how it routes requests. Understand the API structure and routing mechanisms.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+        
+        /* Chapter-specific styling */
+        .chapter-nav { background: rgba(88, 166, 255, 0.05); border: 1px solid rgba(88, 166, 255, 0.2); }
+        .chapter-nav a { transition: all 0.3s ease; }
+        .chapter-nav a:hover { background: rgba(88, 166, 255, 0.1); transform: translateX(5px); }
+        .code-block { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(88, 166, 255, 0.3); border-radius: 0.5rem; padding: 1rem; font-family: 'Monaco', 'Menlo', monospace; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="../index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="../index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="../index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="../index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="../index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chapter Navigation Bar -->
+    <div class="chapter-nav border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="./openfaas-tutorial.html" class="back-button">
+                        ← Back to Tutorial
+                    </a>
+                    <span class="text-primary font-semibold">Chapter 3 of 8</span>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="./openfaas-chapter-1.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">1</a>
+                    <a href="./openfaas-chapter-2.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">2</a>
+                    <a href="./openfaas-chapter-3.html" class="px-3 py-1 rounded bg-primary/20 text-primary border border-primary/30">3</a>
+                    <a href="./openfaas-chapter-4.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">4</a>
+                    <a href="./openfaas-chapter-5.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">5</a>
+                    <a href="./openfaas-chapter-6.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">6</a>
+                    <a href="./openfaas-chapter-7.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">7</a>
+                    <a href="./openfaas-chapter-8.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">8</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Hero Section -->
+    <section class="hero-gradient py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="fade-in">
+                <div class="inline-flex items-center space-x-2 mb-4">
+                    <span class="text-2xl">🔌</span>
+                    <span class="text-primary font-semibold">Chapter 3</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    API Definition
+                </h1>
+                <p class="text-xl text-secondary max-w-3xl mx-auto mb-8 leading-relaxed">
+                    Discover where the OpenFaaS REST API is defined and understand how it routes requests to the appropriate handlers.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span class="tech-badge">REST API</span>
+                    <span class="tech-badge">Request Routing</span>
+                    <span class="tech-badge">HTTP Endpoints</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Content -->
+    <section class="py-16 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="space-y-12">
+                <!-- Where is the REST API Defined? -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🔌 Where is the REST API Defined?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The OpenFaaS REST API is defined in the Gateway's HTTP server setup, using Go's standard HTTP package and custom routing logic to handle different types of requests.
+                    </p>
+                    <div class="feature-card p-6 mb-6">
+                        <h3 class="text-xl font-bold text-white mb-4">API Definition Location:</h3>
+                        <ul class="space-y-2 text-secondary">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Main server setup in <code class="text-primary">main.go</code></span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Route handlers in <code class="text-primary">handlers/</code> package</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Middleware configuration in <code class="text-primary">middleware/</code> package</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>API versioning and endpoint definitions</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- API Structure -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🏗️ API Structure Overview</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The OpenFaaS API follows RESTful principles and is organized into logical groups based on functionality.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Function Management</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• POST /system/functions</li>
+                                <li>• GET /system/functions</li>
+                                <li>• DELETE /system/functions/{name}</li>
+                                <li>• PUT /system/functions/{name}</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Function Invocation</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• POST /function/{name}</li>
+                                <li>• GET /function/{name}</li>
+                                <li>• PUT /function/{name}</li>
+                                <li>• DELETE /function/{name}</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">System Operations</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• GET /system/info</li>
+                                <li>• GET /system/namespaces</li>
+                                <li>• GET /system/scale</li>
+                                <li>• POST /system/scale</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Health & Metrics</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• GET /healthz</li>
+                                <li>• GET /metrics</li>
+                                <li>• GET /system/namespaces</li>
+                                <li>• GET /system/scale</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Routing -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🛣️ How Does Request Routing Work?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The Gateway uses a sophisticated routing system that matches incoming HTTP requests to the appropriate handler functions based on URL patterns and HTTP methods.
+                    </p>
+                    <div class="feature-card p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Routing Process:</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">1.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Request Arrival</h4>
+                                    <p class="text-secondary text-sm">HTTP request reaches the Gateway server</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">2.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">URL Parsing</h4>
+                                    <p class="text-secondary text-sm">Request URL is parsed to extract path and query parameters</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">3.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Route Matching</h4>
+                                    <p class="text-secondary text-sm">URL pattern is matched against registered routes</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">4.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Handler Selection</h4>
+                                    <p class="text-secondary text-sm">Appropriate handler function is selected</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">5.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Request Processing</h4>
+                                    <p class="text-secondary text-sm">Handler processes the request and generates response</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Example -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">💻 API Definition Code Example</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Here's how the API routes are defined in the OpenFaaS Gateway codebase.
+                    </p>
+                    <div class="code-block">
+                        <div class="text-primary text-sm mb-2">// Main API route setup</div>
+                        <code class="text-blue-400">func setupRoutes(router *mux.Router, h *handlers.Handler) {</code><br><br>
+                        <code class="text-blue-400">    // Function management routes</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/system/functions", h.ListFunctions).Methods("GET")</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/system/functions", h.DeployFunction).Methods("POST")</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/system/functions/{name}", h.DeleteFunction).Methods("DELETE")</code><br><br>
+                        <code class="text-blue-400">    // Function invocation routes</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/function/{name}", h.InvokeFunction).Methods("POST", "GET", "PUT", "DELETE")</code><br><br>
+                        <code class="text-blue-400">    // System routes</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/system/info", h.SystemInfo).Methods("GET")</code><br>
+                        <code class="text-green-400">    router.HandleFunc("/healthz", h.Health).Methods("GET")</code><br>
+                        <code class="text-blue-400">}</code>
+                    </div>
+                </div>
+
+                <!-- Middleware Integration -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🔗 Middleware Integration</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The API routes are enhanced with middleware that provides cross-cutting concerns like authentication, logging, and request validation.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Authentication Middleware</h4>
+                            <p class="text-secondary text-sm">
+                                Validates API keys, JWT tokens, or other authentication mechanisms before processing requests.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Logging Middleware</h4>
+                            <p class="text-secondary text-sm">
+                                Logs incoming requests, response times, and error conditions for monitoring and debugging.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">CORS Middleware</h4>
+                            <p class="text-secondary text-sm">
+                                Handles Cross-Origin Resource Sharing headers for web-based clients.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Rate Limiting</h4>
+                            <p class="text-secondary text-sm">
+                                Prevents abuse by limiting the number of requests from a single client.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">➡️ What's Next?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Now that you understand how the API is defined and routes requests, let's explore how the Gateway transforms and authenticates requests through middleware.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="./openfaas-chapter-4.html" class="cta-button">
+                            🚀 Continue to Chapter 4: Request Middleware
+                        </a>
+                        <a href="./openfaas-tutorial.html" class="social-badge">
+                            📚 Back to Tutorial Overview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Navigation Footer -->
+    <section class="py-12 gradient-bg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <div class="mb-4 sm:mb-0">
+                    <a href="./openfaas-chapter-2.html" class="text-secondary hover:text-primary transition-colors">
+                        ← Chapter 2: Configuration
+                    </a>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="text-secondary">Chapter 3 of 8</span>
+                    <a href="./openfaas-chapter-4.html" class="text-primary hover:text-white transition-colors">
+                        Chapter 4: Request Middleware →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">OpenFaaS Tutorial</h3>
+                    <p class="text-gray-400 text-sm">
+                        AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="../index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./openfaas-tutorial.html" class="text-gray-400 hover:text-primary transition-colors">Tutorial Overview</a></li>
+                        <li><a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. OpenFaaS Tutorial - Chapter 3: API Definition</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serv-Drishti - Interactive Serverless Computing Simulator</title>
+    <meta name="description" content="Interactive visualization tool that provides an in-depth look at serverless computing internals, request routing, resource management, and performance analytics.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="./index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="./index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="./index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="./index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="./index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="fade-in text-center md:text-left">
+                    <div class="inline-flex items-center space-x-2 mb-4">
+                        <span class="text-xl">📊</span>
+                        <span class="text-primary font-semibold">Serverless Visualization</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                        Serv-Drishti
+                    </h1>
+                    <p class="text-xl text-secondary mb-8 leading-relaxed">
+                        Interactive visualization tool that provides an in-depth look at serverless computing internals, request routing, resource management, and performance analytics. Perfect for learning, teaching, and demonstrating serverless concepts.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
+                        <a href="https://serv-drishti.siddharthagarwal.net" target="_blank" rel="noopener" class="cta-button">
+                            🚀 Get Started
+                        </a>
+                        <a href="#features" class="social-badge">
+                            📖 Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="stats-card p-10 text-center card-hover">
+                        <div class="text-6xl mb-4">🧭</div>
+                        <h3 class="text-xl font-bold text-white mb-2">See Serverless in Motion</h3>
+                        <p class="text-secondary">Trace requests end-to-end, visualize cold starts, and compare routing/placement strategies with live analytics.</p>
+                        <div class="mt-6 flex justify-center gap-3">
+                            <span class="feature-badge">Interactive</span>
+                            <span class="feature-badge">Analytical</span>
+                            <span class="feature-badge">Educational</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Benefits Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Why Choose Serv-Drishti?</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Transform complex serverless concepts into interactive, visual learning experiences with comprehensive analytics and real-time simulation.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🎨</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Interactive Visual Simulation</h3>
+                    <p class="text-secondary">
+                        Watch requests travel through your serverless architecture in real-time with animated flow visualization and dynamic function states.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Comprehensive Analytics</h3>
+                    <p class="text-secondary">
+                        Multiple specialized charts for performance analysis, resource utilization, cold start tracking, and detailed metrics tables.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">⚔️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Battleground Mode</h3>
+                    <p class="text-secondary">
+                        Compare different routing strategies and placement algorithms side-by-side with synchronized testing and performance analysis.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🎓</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Educational Excellence</h3>
+                    <p class="text-secondary">
+                        Perfect for computer science courses, workshops, training, and self-learning complex distributed systems concepts.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🔧</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Highly Configurable</h3>
+                    <p class="text-secondary">
+                        Extensive customization options for routing strategies, placement algorithms, resource management, and auto-scaling parameters.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">💾</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Data Export & Analysis</h3>
+                    <p class="text-secondary">
+                        Export data in CSV, JSON, and PNG formats for external analysis, reports, and presentations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🏗️ Modular Architecture</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Clean, maintainable codebase with clear separation of concerns and extensible design patterns.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Components</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🎯</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Core Layer</h4>
+                                <p class="text-secondary">Chart management, simulation engine, and placement algorithms</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🎨</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">UI Layer</h4>
+                                <p class="text-secondary">Notification system, configuration management, and event handling</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">✨</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Feature Modules</h4>
+                                <p class="text-secondary">Battleground testing and data export capabilities</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🛠️</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">Utilities</h4>
+                                <p class="text-secondary">Shared utilities and application coordination</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <div class="mx-auto w-80 h-80 rounded-lg shadow-2xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-primary/20 p-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🏗️</div>
+                            <div class="text-primary font-bold text-xl mb-2">System Architecture</div>
+                            <div class="text-secondary text-sm leading-relaxed">
+                                <div class="mb-2">🎯 Core Business Logic</div>
+                                <div class="mb-2">🎨 User Interface Layer</div>
+                                <div class="mb-2">✨ Feature Modules</div>
+                                <div class="mb-2">🛠️ Shared Utilities</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">💼 Professional Applications</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Serv-Drishti delivers value across diverse educational and professional scenarios.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🏫</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Academic Education</h3>
+                    <p class="text-secondary mb-4">
+                        Perfect for computer science courses, workshops, and training sessions on serverless computing.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Course Material</span>
+                        <span class="tech-badge">Workshops</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🏢</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Enterprise Training</h3>
+                    <p class="text-secondary mb-4">
+                        Onboard new team members and demonstrate serverless architecture concepts to stakeholders.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Team Onboarding</span>
+                        <span class="tech-badge">Stakeholder Demos</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🎤</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Presentations & Demos</h3>
+                    <p class="text-secondary mb-4">
+                        Engaging visual aid for conference talks, client demonstrations, and technical reviews.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Conference Talks</span>
+                        <span class="tech-badge">Client Demos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🛠️ Technical Features</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Built with modern web technologies and designed for extensibility and maintainability.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Technologies</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🌐</span>
+                            <span class="text-secondary">Modern web browsers (Chrome 90+, Firefox 88+)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📊</span>
+                            <span class="text-secondary">Chart.js for powerful visualizations</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🐳</span>
+                            <span class="text-secondary">Docker for easy deployment</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🔧</span>
+                            <span class="text-secondary">Modular JavaScript architecture</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📱</span>
+                            <span class="text-secondary">Responsive design for all devices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Advanced Capabilities</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🎛️</span>
+                            <span class="text-secondary">Multiple routing strategies</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🏗️</span>
+                            <span class="text-secondary">Placement algorithms</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">⚡</span>
+                            <span class="text-secondary">Auto-scaling simulation</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📈</span>
+                            <span class="text-secondary">Real-time performance metrics</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">💾</span>
+                            <span class="text-secondary">Data export capabilities</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Ready to Visualize Serverless Computing?</h2>
+                <p class="text-xl text-secondary mb-8">
+                    Join the future of interactive serverless education with our comprehensive visualization tool. Experience real-time simulation, advanced analytics, and professional-grade features.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://serv-drishti.siddharthagarwal.net" target="_blank" rel="noopener" class="cta-button">
+                        🚀 Get Started Today
+                    </a>
+                    <a href="./blog/index.html" class="social-badge">
+                        📚 Read Our Blog
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Serv-Drishti</h3>
+                    <p class="text-gray-400 text-sm">
+                        Interactive visualization tool for serverless computing internals, request routing, resource management, and performance analytics.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./blog/index.html" class="text-gray-400 hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="https://serv-drishti.siddharthagarwal.net" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">Live Demo</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. Serv-Drishti - Interactive Serverless Computing Simulator</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

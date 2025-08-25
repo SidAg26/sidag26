@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenFaaS Tutorial - How, Why, and Where in Code</title>
+    <meta name="description" content="AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework. Learn the internal workings through practical code exploration.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="./index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="./index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="./index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="./index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="./index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="./index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="fade-in text-center md:text-left">
+                    <div class="inline-flex items-center space-x-2 mb-4">
+                        <span class="text-xl">📚</span>
+                        <span class="text-primary font-semibold">Code-Centric Tutorial</span>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-bold text-white mb-6">
+                        OpenFaaS: How, Why, and Where in Code
+                    </h1>
+                    <p class="text-xl text-secondary mb-8 leading-relaxed">
+                        AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework. Master the internal workings through practical code exploration and hands-on learning.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 md:justify-start justify-center">
+                        <a href="#chapters" class="cta-button">
+                            🚀 Start Learning
+                        </a>
+                        <a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="social-badge">
+                            📚 View on GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="stats-card p-10 text-center card-hover">
+                        <div class="text-6xl mb-4">🧩</div>
+                        <h3 class="text-xl font-bold text-white mb-2">Code-Centric Learning Path</h3>
+                        <p class="text-secondary">8 structured chapters: Gateway, Config, API, Middleware, Handling, Scaling, Provider, and Metrics—each linked and self-contained.</p>
+                        <div class="mt-6 flex justify-center gap-3">
+                            <span class="feature-badge">Practical</span>
+                            <span class="feature-badge">Architectural</span>
+                            <span class="feature-badge">Hands-on</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Navigation Section -->
+    <section id="chapters" class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">📚 Start Your Learning Journey</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Click on any chapter to dive deep into OpenFaaS architecture. Each chapter is a standalone learning module.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="./openfaas-chapter-1.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🚪</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 1</h3>
+                    <p class="text-sm text-secondary mb-3">Gateway Application</p>
+                    <div class="text-xs text-primary">Control Plane →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-2.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚙️</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 2</h3>
+                    <p class="text-sm text-secondary mb-3">Configuration</p>
+                    <div class="text-xs text-primary">Settings & Knobs →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-3.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🔌</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 3</h3>
+                    <p class="text-sm text-secondary mb-3">API Definition</p>
+                    <div class="text-xs text-primary">REST API & Routing →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-4.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🛡️</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 4</h3>
+                    <p class="text-sm text-secondary mb-3">Request Middleware</p>
+                    <div class="text-xs text-primary">Transformation & Auth →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-5.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚡</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 5</h3>
+                    <p class="text-sm text-secondary mb-3">Request Handling</p>
+                    <div class="text-xs text-primary">Sync/Async & Queueing →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-6.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📈</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 6</h3>
+                    <p class="text-sm text-secondary mb-3">Function Scaling</p>
+                    <div class="text-xs text-primary">Auto-scaling 0 to N →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-7.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🔗</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 7</h3>
+                    <p class="text-sm text-secondary mb-3">Provider Interaction</p>
+                    <div class="text-xs text-primary">Kubernetes Integration →</div>
+                </a>
+                
+                <a href="./openfaas-chapter-8.html" class="feature-card p-6 card-hover slide-up text-center group">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                    <h3 class="text-lg font-bold text-white mb-2 group-hover:text-primary transition-colors">Chapter 8</h3>
+                    <p class="text-sm text-secondary mb-3">Metrics & Monitoring</p>
+                    <div class="text-xs text-primary">Prometheus & Observability →</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Benefits Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Why Choose This OpenFaaS Tutorial?</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Transform your understanding of OpenFaaS from surface-level concepts to deep architectural insights through practical code exploration.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🤖</div>
+                    <h3 class="text-xl font-bold text-white mb-4">AI-First Approach</h3>
+                    <p class="text-secondary">
+                        Generated with AI Codebase Knowledge Builder for optimal learning structure and comprehensive coverage of complex concepts.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">💻</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Code-Centric Learning</h3>
+                    <p class="text-secondary">
+                        Focus on actual implementation details - learn not just what components do, but how and why they work in the codebase.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🏗️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Architecture Deep Dive</h3>
+                    <p class="text-secondary">
+                        Explore the internal workings of OpenFaaS Gateway, from configuration to scaling, through 8 comprehensive chapters.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Practical Focus</h3>
+                    <p class="text-secondary">
+                        Understand real-world implementation details that go beyond theoretical concepts and documentation.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">☁️</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Kubernetes Native</h3>
+                    <p class="text-secondary">
+                        Learn serverless computing in the context of modern Kubernetes environments and cloud-native architectures.
+                    </p>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📖</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Structured Learning</h3>
+                    <p class="text-secondary">
+                        Progressive chapters that build understanding from basic concepts to advanced architectural patterns.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tutorial Structure Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">📚 Comprehensive 8-Chapter Structure</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Each chapter dives deep into specific building blocks of OpenFaaS, showing how, why, and where in the codebase.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Learning Path</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🚪</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">
+                                    <a href="./openfaas-chapter-1.html" class="text-primary hover:text-white transition-colors">Chapter 1: Gateway Application</a>
+                                </h4>
+                                <p class="text-secondary">What is the Gateway? Why is it the control plane?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">⚙️</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">
+                                    <a href="./openfaas-chapter-2.html" class="text-primary hover:text-white transition-colors">Chapter 2: Configuration</a>
+                                </h4>
+                                <p class="text-secondary">How is the Gateway configured? What are the knobs?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🔌</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">
+                                    <a href="./openfaas-chapter-3.html" class="text-primary hover:text-white transition-colors">Chapter 3: API Definition</a>
+                                </h4>
+                                <p class="text-secondary">Where is the REST API defined and how does it route requests?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="tech-icon">🛡️</div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-2">
+                                    <a href="./openfaas-chapter-4.html" class="text-primary hover:text-white transition-colors">Chapter 4: Request Middleware</a>
+                                </h4>
+                                <p class="text-secondary">How does the Gateway transform and authenticate requests?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <div class="mx-auto w-80 h-80 rounded-lg shadow-2xl bg-gradient-to-br from-primary/10 to-blue-600/10 border border-primary/20 p-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">📚</div>
+                            <div class="text-primary font-bold text-xl mb-2">Complete Tutorial</div>
+                            <div class="text-secondary text-sm leading-relaxed">
+                                <div class="mb-2">🚪 Gateway & Control Plane</div>
+                                <div class="mb-2">⚙️ Configuration & Knobs</div>
+                                <div class="mb-2">🔌 API & Routing</div>
+                                <div class="mb-2">🛡️ Middleware & Auth</div>
+                                <div class="mb-2">⚡ Sync/Async Handling</div>
+                                <div class="mb-2">📈 Scaling & Metrics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Chapters Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🚀 Advanced Topics & Implementation</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Master the complex aspects of OpenFaaS through detailed code analysis and architectural insights.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">⚡</div>
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <a href="./openfaas-chapter-5.html" class="text-primary hover:text-white transition-colors">Request Handling</a>
+                    </h3>
+                    <p class="text-secondary mb-4">
+                        Chapter 5: How are functions invoked (sync/async)? Where does queueing happen?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Sync/Async</span>
+                        <span class="tech-badge">Queueing</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">📈</div>
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <a href="./openfaas-chapter-6.html" class="text-primary hover:text-white transition-colors">Function Scaling</a>
+                    </h3>
+                    <p class="text-secondary mb-4">
+                        Chapter 6: How does OpenFaaS auto-scale functions from 0 to N?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Auto-scaling</span>
+                        <span class="tech-badge">0 to N</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">🔗</div>
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <a href="./openfaas-chapter-7.html" class="text-primary hover:text-white transition-colors">Provider Interaction</a>
+                    </h3>
+                    <p class="text-secondary mb-4">
+                        Chapter 7: How does the Gateway interact with the Kubernetes provider?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Kubernetes</span>
+                        <span class="tech-badge">Provider</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-3xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold text-white mb-4">
+                        <a href="./openfaas-chapter-8.html" class="text-primary hover:text-white transition-colors">Metrics & Monitoring</a>
+                    </h3>
+                    <p class="text-secondary mb-4">
+                        Chapter 8: How are Prometheus metrics exposed and what do they represent?
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Prometheus</span>
+                        <span class="tech-badge">Observability</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Features Section -->
+    <section class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🛠️ Technical Implementation</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Built with modern tools and designed for optimal learning experience in serverless computing.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Core Technologies</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🐳</span>
+                            <span class="text-secondary">OpenFaaS - Kubernetes-native serverless framework</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">☸️</span>
+                            <span class="text-secondary">Kubernetes integration and deployment</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🔧</span>
+                            <span class="text-secondary">Go programming language examples</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📊</span>
+                            <span class="text-secondary">Prometheus monitoring and metrics</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🤖</span>
+                            <span class="text-secondary">AI-generated educational content</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slide-up">
+                    <h3 class="text-2xl font-bold text-white mb-6">Learning Features</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">📖</span>
+                            <span class="text-secondary">8 comprehensive chapters</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">💻</span>
+                            <span class="text-secondary">Code-first approach</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🎯</span>
+                            <span class="text-secondary">Practical examples</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🏗️</span>
+                            <span class="text-secondary">Architecture deep-dive</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="tech-icon-small">🚀</span>
+                            <span class="text-secondary">Production-ready insights</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">🚀 Getting Started</h2>
+                <p class="text-xl text-secondary max-w-3xl mx-auto">
+                    Begin your journey into OpenFaaS architecture with these simple steps.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📋</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Prerequisites</h3>
+                    <p class="text-secondary mb-4">
+                        Basic understanding of Kubernetes and serverless concepts. Familiarity with Go programming language.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Kubernetes</span>
+                        <span class="tech-badge">Serverless</span>
+                        <span class="tech-badge">Go</span>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📥</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Clone Repository</h3>
+                    <p class="text-secondary mb-4">
+                        Get the complete tutorial with all chapters and examples ready for local exploration.
+                    </p>
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <code class="text-sm text-green-400">git clone https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code.git</code>
+                    </div>
+                </div>
+                
+                <div class="feature-card p-8 card-hover slide-up">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold text-white mb-4">Start Learning</h3>
+                    <p class="text-secondary mb-4">
+                        Begin with Overview.md and proceed through chapters sequentially for optimal learning.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tech-badge">Overview.md</span>
+                        <span class="tech-badge">Sequential</span>
+                        <span class="tech-badge">Hands-on</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="slide-up">
+                <h2 class="text-4xl font-bold text-white mb-6">Ready to Master OpenFaaS Architecture?</h2>
+                <p class="text-xl text-secondary mb-8">
+                    Join the community of developers mastering serverless computing through deep code understanding. Start your OpenFaaS journey today!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="cta-button">
+                        🚀 Start Learning Today
+                    </a>
+                    <a href="./blog/index.html" class="social-badge">
+                        📚 Read Our Blog
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">OpenFaaS Tutorial</h3>
+                    <p class="text-gray-400 text-sm">
+                        AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework. Master the internal workings through practical code exploration.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="./index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./blog/index.html" class="text-gray-400 hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. OpenFaaS Tutorial - How, Why, and Where in Code</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

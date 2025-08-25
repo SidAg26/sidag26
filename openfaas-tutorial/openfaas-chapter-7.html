@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Provider Interaction - OpenFaaS Tutorial</title>
+    <meta name="description" content="Learn how the OpenFaaS Gateway interacts with the Kubernetes provider. Understand the integration mechanisms and provider architecture.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+        
+        /* Chapter-specific styling */
+        .chapter-nav { background: rgba(88, 166, 255, 0.05); border: 1px solid rgba(88, 166, 255, 0.2); }
+        .chapter-nav a { transition: all 0.3s ease; }
+        .chapter-nav a:hover { background: rgba(88, 166, 255, 0.1); transform: translateX(5px); }
+        .code-block { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(88, 166, 255, 0.3); border-radius: 0.5rem; padding: 1rem; font-family: 'Monaco', 'Menlo', monospace; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="../index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="../index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="../index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="../index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="../index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chapter Navigation Bar -->
+    <div class="chapter-nav border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="./openfaas-tutorial.html" class="back-button">
+                        ← Back to Tutorial
+                    </a>
+                    <span class="text-primary font-semibold">Chapter 7 of 8</span>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="./openfaas-chapter-1.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">1</a>
+                    <a href="./openfaas-chapter-2.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">2</a>
+                    <a href="./openfaas-chapter-3.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">3</a>
+                    <a href="./openfaas-chapter-4.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">4</a>
+                    <a href="./openfaas-chapter-5.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">5</a>
+                    <a href="./openfaas-chapter-6.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">6</a>
+                    <a href="./openfaas-chapter-7.html" class="px-3 py-1 rounded bg-primary/20 text-primary border border-primary/30">7</a>
+                    <a href="./openfaas-chapter-8.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">8</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Hero Section -->
+    <section class="hero-gradient py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="fade-in">
+                <div class="inline-flex items-center space-x-2 mb-4">
+                    <span class="text-2xl">🔗</span>
+                    <span class="text-primary font-semibold">Chapter 7</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    Provider Interaction
+                </h1>
+                <p class="text-xl text-secondary max-w-3xl mx-auto mb-8 leading-relaxed">
+                    Discover how the OpenFaaS Gateway interacts with the Kubernetes provider to manage function lifecycle, scaling, and resource allocation.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span class="tech-badge">Kubernetes</span>
+                    <span class="tech-badge">Provider</span>
+                    <span class="tech-badge">Integration</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Content -->
+    <section class="py-16 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="space-y-12">
+                <!-- What is the Provider? -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🔗 What is the Kubernetes Provider?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The Kubernetes provider is the component that translates OpenFaaS concepts into Kubernetes resources, managing the actual deployment, scaling, and lifecycle of functions in the cluster.
+                    </p>
+                    <div class="feature-card p-6 mb-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Provider Responsibilities:</h3>
+                        <ul class="space-y-2 text-secondary">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Function deployment and management</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Pod lifecycle management</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Resource allocation and limits</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Scaling operations</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Gateway-Provider Communication -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">💬 How Does the Gateway Communicate with the Provider?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The Gateway and provider communicate through a well-defined interface, allowing the Gateway to delegate infrastructure operations while maintaining control over function behavior.
+                    </p>
+                    <div class="feature-card p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Communication Flow:</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">1.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Request Processing</h4>
+                                    <p class="text-secondary text-sm">Gateway receives function requests and determines required actions</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">2.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Provider API Calls</h4>
+                                    <p class="text-secondary text-sm">Gateway calls provider APIs to execute infrastructure operations</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">3.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Kubernetes Operations</h4>
+                                    <p class="text-secondary text-sm">Provider executes Kubernetes operations (deploy, scale, delete)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">4.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Status Updates</h4>
+                                    <p class="text-secondary text-sm">Provider returns operation status and results to Gateway</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">5.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Response Handling</h4>
+                                    <p class="text-secondary text-sm">Gateway processes provider responses and updates function state</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Provider Architecture -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🏗️ Provider Architecture</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The Kubernetes provider is built with a modular architecture that separates concerns and provides extensibility for different deployment scenarios.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">API Layer</h4>
+                            <p class="text-secondary text-sm">
+                                Exposes REST APIs that the Gateway calls to perform operations like deploy, scale, and delete functions.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Kubernetes Client</h4>
+                            <p class="text-secondary text-sm">
+                                Manages connections to the Kubernetes API server and handles authentication and authorization.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Resource Manager</h4>
+                            <p class="text-secondary text-sm">
+                                Handles the creation, updating, and deletion of Kubernetes resources like Deployments, Services, and ConfigMaps.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Monitoring & Health</h4>
+                            <p class="text-secondary text-sm">
+                                Tracks the health and status of deployed functions and provides metrics for the Gateway.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Function Deployment Process -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🚀 Function Deployment Process</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        When the Gateway requests a function deployment, the provider orchestrates a complex process to create and manage the function in Kubernetes.
+                    </p>
+                    <div class="feature-card p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Deployment Steps:</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-primary font-semibold">1. Image Validation</h4>
+                                <p class="text-secondary text-sm">Provider validates the function image and ensures it's accessible</p>
+                            </div>
+                            <div>
+                                <h4 class="text-primary font-semibold">2. Resource Calculation</h4>
+                                <p class="text-secondary text-sm">Calculates required CPU, memory, and other resource requirements</p>
+                            </div>
+                            <div>
+                                <h4 class="text-primary font-semibold">3. Kubernetes Resource Creation</h4>
+                                <p class="text-secondary text-sm">Creates Deployment, Service, and other required Kubernetes resources</p>
+                            </div>
+                            <div>
+                                <h4 class="text-primary font-semibold">4. Health Monitoring</h4>
+                                <p class="text-secondary text-sm">Monitors pod health and readiness for function invocation</p>
+                            </div>
+                            <div>
+                                <h4 class="text-primary font-semibold">5. Status Reporting</h4>
+                                <p class="text-secondary text-sm">Reports deployment status back to the Gateway</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scaling Operations -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">📈 Scaling Operations</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The provider handles all scaling operations, from scaling to zero to rapid scale-up during traffic spikes.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Scale Up</h4>
+                            <p class="text-secondary text-sm">
+                                Creates new pods when demand increases, ensuring optimal performance during high load.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Scale Down</h4>
+                            <p class="text-secondary text-sm">
+                                Reduces pod count when demand decreases, optimizing resource utilization and costs.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Scale to Zero</h4>
+                            <p class="text-secondary text-sm">
+                                Terminates all pods when no requests are received, providing true serverless economics.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Predictive Scaling</h4>
+                            <p class="text-secondary text-sm">
+                                Uses historical data to anticipate demand and scale proactively.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Example -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">💻 Provider Integration Code Example</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Here's how the Gateway integrates with the Kubernetes provider to manage function operations.
+                    </p>
+                    <div class="code-block">
+                        <div class="text-primary text-sm mb-2">// Gateway calling provider for function deployment</div>
+                        <code class="text-blue-400">func (g *Gateway) DeployFunction(function *Function) error {</code><br><br>
+                        <code class="text-blue-400">    // Prepare deployment request</code><br>
+                        <code class="text-green-400">    req := &provider.DeployRequest{</code><br>
+                        <code class="text-green-400">        Name: function.Name,</code><br>
+                        <code class="text-green-400">        Image: function.Image,</code><br>
+                        <code class="text-green-400">        Replicas: function.Replicas,</code><br>
+                        <code class="text-green-400">        Limits: function.Limits,</code><br>
+                        <code class="text-green-400">    }</code><br><br>
+                        <code class="text-blue-400">    // Call provider API</code><br>
+                        <code class="text-green-400">    resp, err := g.provider.Deploy(req)</code><br>
+                        <code class="text-green-400">    if err != nil {</code><br>
+                        <code class="text-red-400">        return fmt.Errorf("deployment failed: %v", err)</code><br>
+                        <code class="text-green-400">    }</code><br><br>
+                        <code class="text-blue-400">    // Update function status</code><br>
+                        <code class="text-green-400">    g.updateFunctionStatus(function.Name, resp.Status)</code><br><br>
+                        <code class="text-blue-400">    return nil</code><br>
+                        <code class="text-blue-400">}</code>
+                    </div>
+                </div>
+
+                <!-- Error Handling and Recovery -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">⚠️ Error Handling and Recovery</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The provider implements robust error handling and recovery mechanisms to ensure system reliability and function availability.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Pod Failure Recovery</h4>
+                            <p class="text-secondary text-sm">
+                                Automatically restarts failed pods and handles various failure scenarios gracefully.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Resource Quota Management</h4>
+                            <p class="text-secondary text-sm">
+                                Handles resource constraints and implements backoff strategies when resources are limited.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Network Issues</h4>
+                            <p class="text-secondary text-sm">
+                                Manages network connectivity issues and implements retry mechanisms for transient failures.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Health Checks</h4>
+                            <p class="text-secondary text-sm">
+                                Implements comprehensive health checking to detect and resolve issues proactively.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">➡️ What's Next?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Now that you understand how the Gateway interacts with the provider, let's explore how metrics and monitoring are implemented to provide observability into the system.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="./openfaas-chapter-8.html" class="cta-button">
+                            🚀 Continue to Chapter 8: Metrics & Monitoring
+                        </a>
+                        <a href="./openfaas-tutorial.html" class="social-badge">
+                            📚 Back to Tutorial Overview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Navigation Footer -->
+    <section class="py-12 gradient-bg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <div class="mb-4 sm:mb-0">
+                    <a href="./openfaas-chapter-6.html" class="text-secondary hover:text-primary transition-colors">
+                        ← Chapter 6: Function Scaling
+                    </a>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="text-secondary">Chapter 7 of 8</span>
+                    <a href="./openfaas-chapter-8.html" class="text-primary hover:text-white transition-colors">
+                        Chapter 8: Metrics & Monitoring →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">OpenFaaS Tutorial</h3>
+                    <p class="text-gray-400 text-sm">
+                        AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="../index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./openfaas-tutorial.html" class="text-gray-400 hover:text-primary transition-colors">Tutorial Overview</a></li>
+                        <li><a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. OpenFaaS Tutorial - Chapter 7: Provider Interaction</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

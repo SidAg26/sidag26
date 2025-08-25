@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: Metrics & Monitoring - OpenFaaS Tutorial</title>
+    <meta name="description" content="Learn how OpenFaaS exposes Prometheus metrics and what they represent. Understand the observability and monitoring capabilities.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#58a6ff',
+                        secondary: '#c9d1d9',
+                        dark: '#0d1117',
+                        'dark-lighter': '#161b22'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0d1117 0%, #161b22 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); }
+        .tech-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+        .feature-badge { background: rgba(255, 107, 107, 0.1); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 0.5rem; }
+        .social-badge { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.75rem 1.25rem; font-size: 1rem; border-radius: 0.5rem; }
+        .social-badge:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .stats-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 1rem; }
+        .back-button { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+        .back-button:hover { background: rgba(88, 166, 255, 0.2); transform: translateY(-2px); }
+        .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; vertical-align: middle; }
+        .tech-icon-small { font-size: 1.25rem; margin-right: 0.25rem; vertical-align: middle; }
+        
+        /* Enhanced animations */
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        .slide-up { animation: slideUp 0.6s ease-out; }
+        .scale-in { animation: scaleIn 0.5s ease-out; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Professional landing page styling */
+        .hero-gradient { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1f2937 100%); }
+        .feature-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 1rem; }
+        .cta-button { background: linear-gradient(135deg, #58a6ff 0%, #3b82f6 100%); color: white; padding: 1rem 2rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(88, 166, 255, 0.3); }
+        
+        /* Font size overrides to match index.html */
+        body { font-size: 16px; line-height: 1.6; }
+        .text-sm { font-size: 0.95rem !important; }
+        .text-xs { font-size: 0.875rem !important; }
+        .text-lg { font-size: 1.125rem !important; }
+        .text-xl { font-size: 1.25rem !important; }
+        .text-2xl { font-size: 1.5rem !important; }
+        .text-4xl { font-size: 2.5rem !important; }
+        .text-5xl { font-size: 3rem !important; }
+        .text-6xl { font-size: 3.5rem !important; }
+        
+        /* Chapter-specific styling */
+        .chapter-nav { background: rgba(88, 166, 255, 0.05); border: 1px solid rgba(88, 166, 255, 0.2); }
+        .chapter-nav a { transition: all 0.3s ease; }
+        .chapter-nav a:hover { background: rgba(88, 166, 255, 0.1); transform: translateX(5px); }
+        .code-block { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(88, 166, 255, 0.3); border-radius: 0.5rem; padding: 1rem; font-family: 'Monaco', 'Menlo', monospace; }
+    </style>
+</head>
+<body class="bg-dark text-secondary min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg border-b border-gray-800 sticky top-0 z-50 backdrop-blur-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="../index.html" class="text-2xl font-bold text-primary hover:underline">🚀 Siddharth Agarwal</a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="../index.html#about" class="text-secondary hover:text-primary transition-colors">About</a>
+                    <a href="../index.html#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="../index.html#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
+                    <a href="../index.html#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
+                    <a href="../index.html#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chapter Navigation Bar -->
+    <div class="chapter-nav border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="./openfaas-tutorial.html" class="back-button">
+                        ← Back to Tutorial
+                    </a>
+                    <span class="text-primary font-semibold">Chapter 8 of 8</span>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="./openfaas-chapter-1.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">1</a>
+                    <a href="./openfaas-chapter-2.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">2</a>
+                    <a href="./openfaas-chapter-3.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">3</a>
+                    <a href="./openfaas-chapter-4.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">4</a>
+                    <a href="./openfaas-chapter-5.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">5</a>
+                    <a href="./openfaas-chapter-6.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">6</a>
+                    <a href="./openfaas-chapter-7.html" class="px-3 py-1 rounded hover:bg-primary/10 text-secondary hover:text-primary border border-gray-600 hover:border-primary/30 transition-all">7</a>
+                    <a href="./openfaas-chapter-8.html" class="px-3 py-1 rounded bg-primary/20 text-primary border border-primary/30">8</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter Hero Section -->
+    <section class="hero-gradient py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="fade-in">
+                <div class="inline-flex items-center space-x-2 mb-4">
+                    <span class="text-2xl">📊</span>
+                    <span class="text-primary font-semibold">Chapter 8</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    Metrics & Monitoring
+                </h1>
+                <p class="text-xl text-secondary max-w-3xl mx-auto mb-8 leading-relaxed">
+                    Discover how OpenFaaS exposes Prometheus metrics and what they represent. Understand the observability and monitoring capabilities.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span class="tech-badge">Prometheus</span>
+                    <span class="tech-badge">Observability</span>
+                    <span class="tech-badge">Monitoring</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Content -->
+    <section class="py-16 bg-dark">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="space-y-12">
+                <!-- Why Metrics Matter -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">📊 Why Do Metrics Matter in OpenFaaS?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Metrics provide crucial insights into the health, performance, and behavior of your OpenFaaS system, enabling proactive monitoring, debugging, and optimization.
+                    </p>
+                    <div class="feature-card p-6 mb-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Key Benefits of Metrics:</h3>
+                        <ul class="space-y-2 text-secondary">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Real-time system health monitoring</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Performance bottleneck identification</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Capacity planning and resource optimization</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Automated alerting and incident response</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Prometheus Integration -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🔗 How Does Prometheus Integration Work?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        OpenFaaS integrates seamlessly with Prometheus, exposing metrics in a standardized format that can be scraped, stored, and analyzed for comprehensive monitoring.
+                    </p>
+                    <div class="feature-card p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Prometheus Integration Flow:</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">1.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Metrics Collection</h4>
+                                    <p class="text-secondary text-sm">OpenFaaS components collect metrics during operation</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">2.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Metrics Exposition</h4>
+                                    <p class="text-secondary text-sm">Metrics are exposed on HTTP endpoints in Prometheus format</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">3.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Prometheus Scraping</h4>
+                                    <p class="text-secondary text-sm">Prometheus scrapes metrics from configured endpoints</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">4.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Data Storage</h4>
+                                    <p class="text-secondary text-sm">Metrics are stored in Prometheus time-series database</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-primary text-lg">5.</span>
+                                <div>
+                                    <h4 class="text-white font-semibold">Querying & Visualization</h4>
+                                    <p class="text-secondary text-sm">Metrics can be queried and visualized in Grafana or other tools</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Categories -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">📈 Key Metrics Categories</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        OpenFaaS exposes comprehensive metrics across multiple categories, providing visibility into every aspect of the system.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">🚀 Function Metrics</h4>
+                            <p class="text-secondary text-sm">
+                                Invocation counts, response times, error rates, and scaling information for individual functions.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">⚙️ Gateway Metrics</h4>
+                            <p class="text-secondary text-sm">
+                                Request handling, authentication, middleware performance, and overall gateway health.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">📊 System Metrics</h4>
+                            <p class="text-secondary text-sm">
+                                Resource utilization, memory usage, CPU consumption, and system-level performance indicators.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">🔗 Provider Metrics</h4>
+                            <p class="text-secondary text-sm">
+                                Kubernetes operations, deployment success rates, scaling operations, and provider health.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specific Metrics Examples -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🎯 Specific Metrics Examples</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Here are some of the most important metrics that OpenFaaS exposes and what they tell you about your system.
+                    </p>
+                    <div class="feature-card p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Function Performance Metrics:</h3>
+                        <div class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="text-primary font-semibold">gateway_function_invocation_total</h4>
+                                    <p class="text-sm text-secondary">Total number of function invocations</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-primary font-semibold">gateway_function_duration_seconds</h4>
+                                    <p class="text-sm text-secondary">Function execution duration in seconds</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-primary font-semibold">gateway_function_errors_total</h4>
+                                    <p class="text-sm text-secondary">Total number of function execution errors</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-primary font-semibold">gateway_function_scaling_total</h4>
+                                    <p class="text-sm text-secondary">Total number of scaling operations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gateway Metrics -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🚪 Gateway-Specific Metrics</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        The Gateway exposes metrics that help you understand request flow, performance, and system health.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Request Metrics</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• HTTP request counts by method</li>
+                                <li>• Response status code distribution</li>
+                                <li>• Request duration percentiles</li>
+                                <li>• Active request counts</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Authentication Metrics</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• Authentication success/failure rates</li>
+                                <li>• API key validation metrics</li>
+                                <li>• JWT token validation counts</li>
+                                <li>• Rate limiting statistics</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Middleware Metrics</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• Middleware execution times</li>
+                                <li>• CORS request counts</li>
+                                <li>• Logging operation metrics</li>
+                                <li>• Error handling statistics</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">System Health Metrics</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• Memory usage and garbage collection</li>
+                                <li>• Goroutine counts</li>
+                                <li>• Connection pool statistics</li>
+                                <li>• Uptime and health check results</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Configuration -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">⚙️ Metrics Configuration</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        OpenFaaS provides flexible configuration options for metrics collection, allowing you to customize what and how metrics are exposed.
+                    </p>
+                    <div class="code-block">
+                        <div class="text-primary text-sm mb-2"># Metrics configuration example</div>
+                        <code class="text-blue-400"># Enable metrics collection</code><br>
+                        <code class="text-green-400">metrics_enabled: true</code><br><br>
+                        <code class="text-blue-400"># Metrics endpoint configuration</code><br>
+                        <code class="text-green-400">metrics_port: 8082</code><br>
+                        <code class="text-green-400">metrics_path: /metrics</code><br><br>
+                        <code class="text-blue-400"># Metrics collection intervals</code><br>
+                        <code class="text-green-400">metrics_collection_interval: 15s</code><br><br>
+                        <code class="text-blue-400"># Custom metric labels</code><br>
+                        <code class="text-green-400">metrics_labels:</code><br>
+                        <code class="text-green-400">  environment: production</code><br>
+                        <code class="text-green-400">  region: us-west-2</code><br>
+                        <code class="text-green-400">  version: v1.0.0</code>
+                    </div>
+                </div>
+
+                <!-- Monitoring and Alerting -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🚨 Monitoring and Alerting</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        With Prometheus metrics, you can set up comprehensive monitoring dashboards and alerting rules to proactively manage your OpenFaaS deployment.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Grafana Dashboards</h4>
+                            <p class="text-secondary text-sm">
+                                Create custom dashboards to visualize metrics and track system performance over time.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Alerting Rules</h4>
+                            <p class="text-secondary text-sm">
+                                Set up alerts for critical metrics like high error rates, slow response times, or resource exhaustion.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">SLA Monitoring</h4>
+                            <p class="text-secondary text-sm">
+                                Track service level agreements and performance targets using custom metrics and thresholds.
+                            </p>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Capacity Planning</h4>
+                            <p class="text-secondary text-sm">
+                                Use historical metrics to plan capacity and predict resource requirements for future growth.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">✨ Metrics Best Practices</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Follow these best practices to get the most value from your OpenFaaS metrics and monitoring setup.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Metric Naming</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• Use consistent naming conventions</li>
+                                <li>• Include relevant labels</li>
+                                <li>• Avoid high-cardinality metrics</li>
+                                <li>• Use descriptive metric names</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card p-6">
+                            <h4 class="text-lg font-bold text-white mb-3">Collection Strategy</h4>
+                            <ul class="text-secondary text-sm space-y-1">
+                                <li>• Set appropriate scrape intervals</li>
+                                <li>• Configure retention policies</li>
+                                <li>• Monitor metric cardinality</li>
+                                <li>• Use metric aggregation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tutorial Completion -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🎉 Congratulations! You've Completed the Tutorial</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        You've now explored all 8 chapters of the OpenFaaS tutorial, gaining comprehensive understanding of the architecture, implementation, and monitoring capabilities.
+                    </p>
+                    <div class="feature-card p-6 text-center">
+                        <div class="text-6xl mb-4">🎓</div>
+                        <h3 class="text-xl font-bold text-white mb-4">What You've Learned:</h3>
+                        <ul class="text-secondary space-y-2 text-left max-w-2xl mx-auto">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Gateway architecture and control plane responsibilities</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Configuration management and customization options</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>REST API structure and request routing</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Middleware pipeline and security features</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Request handling and queueing mechanisms</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Auto-scaling from 0 to N instances</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Kubernetes provider integration</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-primary mt-1">•</span>
+                                <span>Prometheus metrics and monitoring</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Final CTA -->
+                <div class="slide-up">
+                    <h2 class="text-3xl font-bold text-white mb-6">🚀 What's Next?</h2>
+                    <p class="text-lg text-secondary mb-6">
+                        Now that you have a comprehensive understanding of OpenFaaS, you're ready to build, deploy, and monitor your own serverless applications!
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="cta-button">
+                            🚀 Explore the Code Repository
+                        </a>
+                        <a href="./openfaas-tutorial.html" class="social-badge">
+                            📚 Review Tutorial Overview
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapter Navigation Footer -->
+    <section class="py-12 gradient-bg">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <div class="mb-4 sm:mb-0">
+                    <a href="./openfaas-chapter-7.html" class="text-secondary hover:text-primary transition-colors">
+                        ← Chapter 7: Provider Interaction
+                    </a>
+                </div>
+                <div class="flex space-x-4">
+                    <span class="text-secondary">Chapter 8 of 8</span>
+                    <span class="text-primary">🎉 Tutorial Complete!</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">OpenFaaS Tutorial</h3>
+                    <p class="text-gray-400 text-sm">
+                        AI-first, code-centric tutorial on OpenFaaS - a Kubernetes-native serverless framework.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="../index.html" class="text-gray-400 hover:text-primary transition-colors">Portfolio</a></li>
+                        <li><a href="./openfaas-tutorial.html" class="text-gray-400 hover:text-primary transition-colors">Tutorial Overview</a></li>
+                        <li><a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="text-gray-400 hover:text-primary transition-colors">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4">Contact</h3>
+                    <p class="text-gray-400 text-sm">
+                        Built by Siddharth Agarwal<br>
+                        PhD Researcher in Cloud Computing<br>
+                        University of Melbourne
+                    </p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">© 2025 Siddharth Agarwal. OpenFaaS Tutorial - Chapter 8: Metrics & Monitoring</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

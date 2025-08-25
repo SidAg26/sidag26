@@ -118,6 +118,30 @@
             margin-right: 0.25rem;
             vertical-align: middle;
         }
+        .tech-logo {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+            display: inline-block;
+            object-fit: contain;
+        }
+        .tech-logo-small {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.25rem;
+            vertical-align: middle;
+            display: inline-block;
+            object-fit: contain;
+        }
+        .tech-logo-badge {
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.25rem;
+            vertical-align: middle;
+            display: inline-block;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="bg-dark text-secondary min-h-screen">
@@ -162,13 +186,15 @@
                     🌐 Website
                 </a>
                 <a href="https://github.com/SidAg26/" class="social-badge hover:no-underline">
-                    🐙 GitHub Pages
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="tech-logo-badge">
+                    GitHub Pages
                 </a>
                 <a href="./blog/index.html" class="social-badge hover:no-underline">
                     📚 Blog
                 </a>
                 <a href="https://www.linkedin.com/in/siddharth26agarwal" class="social-badge hover:no-underline">
-                    💼 LinkedIn
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" class="tech-logo-badge">
+                    LinkedIn
                 </a>
                 <a href="https://scholar.google.com/citations?hl=en&user=6sx7cYEAAAAJ" class="social-badge hover:no-underline">
                     🎓 Scholar
@@ -276,17 +302,17 @@
                         <h4 class="text-sm font-semibold text-white mb-2">Current & Completed:</h4>
                         <ul class="text-sm text-gray-400 space-y-1">
                             <li>🚀 Serverless Optimization Research (2021-Present)</li>
-                            <li>❄️ Cold Start Reduction using RL (2021-2024)</li>
-                            <li>📊 Intelligent Autoscaling Algorithms (2022-2024)</li>
+                            <li>❄️ Cold Start Reduction using RL (2021-2022)</li>
+                            <li>📊 Intelligent Autoscaling Algorithms (2022-2023)</li>
                             <li>🧠 Dynamic Memory Configuration (2023-2024)</li>
-                            <li>🎯 Input-aware Function Scheduling (2023-Present)</li>
+                            <li>🎯 Input-aware Function Scheduling (2024-Present)</li>
                         </ul>
                     </div>
                     <div class="mb-4">
                         <h4 class="text-sm font-semibold text-white mb-2">Collaborations:</h4>
                         <ul class="text-sm text-gray-400 space-y-1">
                             <li>🏢 Telstra Corporation Ltd. (Vocational Placement)</li>
-                            <li>🎓 University of Melbourne Cloud Computing Lab</li>
+                            <li>🎓 University of Melbourne - Cloud Computing and Distributed Systems Lab</li>
                             <li>🌍 International research community</li>
                         </ul>
                     </div>
@@ -312,9 +338,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Intelligent serverless computing platform with AI-powered workload prediction, mathematical optimization, and intelligent resource management.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">OpenFaaS</span>
-                        <span class="tech-badge">Python</span>
-                        <span class="tech-badge">Kubernetes</span>
+                        <span class="tech-badge">
+                            <img src="https://avatars.githubusercontent.com/u/27013154?v=4" alt="OpenFaaS" class="tech-logo-badge">
+                            OpenFaaS
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-badge">
+                            Python
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg" alt="Kubernetes" class="tech-logo-badge">
+                            Kubernetes
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://saarthi.siddharthagarwal.net" target="_blank" rel="noopener" class="social-badge text-sm">Live Demo</a>
@@ -332,9 +367,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Interactive visualization tool for serverless computing internals, request routing, resource management, and performance analytics.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">JavaScript</span>
-                        <span class="tech-badge">Chart.js</span>
-                        <span class="tech-badge">Docker</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" alt="JavaScript" class="tech-logo-badge">
+                            JavaScript
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://www.chartjs.org/img/chartjs-logo.svg" alt="Chart.js" class="tech-logo-badge">
+                            Chart.js
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" alt="Docker" class="tech-logo-badge">
+                            Docker
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://serv-drishti.siddharthagarwal.net" target="_blank" rel="noopener" class="social-badge text-sm">Live Demo</a>
@@ -352,9 +396,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Deep recurrent reinforcement learning method for intelligent autoscaling of serverless functions with LSTM-PPO integration.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">Python</span>
-                        <span class="tech-badge">OpenFaaS</span>
-                        <span class="tech-badge">LSTM</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-badge">
+                            Python
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://avatars.githubusercontent.com/u/27013154?v=4" alt="OpenFaaS" class="tech-logo-badge">
+                            OpenFaaS
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg" alt="LSTM" class="tech-logo-badge">
+                            LSTM
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
@@ -372,9 +425,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Input-aware memory configuration for serverless functions using ensemble learning, reducing costs by up to 87%.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">AWS Lambda</span>
-                        <span class="tech-badge">Python</span>
-                        <span class="tech-badge">DynamoDB</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS Lambda" class="tech-logo-badge">
+                            AWS Lambda
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-badge">
+                            Python
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://svgmix.com/uploads/133ab8-aws-dynamodb.svg" alt="DynamoDB" class="tech-logo-badge">
+                            DynamoDB
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
@@ -392,9 +454,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Comprehensive 8-chapter tutorial on OpenFaaS internals, from gateway to metrics, with practical code examples.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">Go</span>
-                        <span class="tech-badge">Kubernetes</span>
-                        <span class="tech-badge">Docker</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Go_Logo_Blue.svg" alt="Go" class="tech-logo-badge">
+                            Go
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg" alt="Kubernetes" class="tech-logo-badge">
+                            Kubernetes
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" alt="Docker" class="tech-logo-badge">
+                            Docker
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
@@ -412,9 +483,18 @@
                     </a>
                     <p class="text-gray-300 text-sm mb-4">Serverless reinforcement learning training platform combining OpenFaaS with OpenAI Gym for scalable RL pipelines.</p>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">OpenFaaS</span>
-                        <span class="tech-badge">OpenAI Gym</span>
-                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">
+                            <img src="https://avatars.githubusercontent.com/u/27013154?v=4" alt="OpenFaaS" class="tech-logo-badge">
+                            OpenFaaS
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/1/10/PyTorch_logo_icon.svg" alt="OpenAI Gym" class="tech-logo-badge">
+                            OpenAI Gym
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-badge">
+                            Python
+                        </span>
                     </div>
                     <div class="flex gap-3">
                         <a href="https://github.com/SidAg26/FaaSTrainGym" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
@@ -443,7 +523,14 @@
                             <li>🔧 Dynamic function configuration</li>
                         </ul>
                     </div>
-                    <p class="text-gray-300"><strong>Technologies:</strong> 🐍 Python, ☕ Java, ☁️ AWS, 🏗️ OpenStack, 🐳 Kubernetes, 🚀 OpenFaaS</p>
+                    <p class="text-gray-300"><strong>Technologies:</strong> 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-small"> Python, 
+                        <img src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg" alt="Java" class="tech-logo-small"> Java, 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS" class="tech-logo-small"> AWS, 
+                        <img src="https://www.svgrepo.com/show/354145/openstack-icon.svg" alt="OpenStack" class="tech-logo-small"> OpenStack, 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg" alt="Kubernetes" class="tech-logo-small"> Kubernetes, 
+                        <img src="https://avatars.githubusercontent.com/u/27013154?v=4" alt="OpenFaaS" class="tech-logo-small"> OpenFaaS
+                    </p>
                 </div>
                 <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
                     <h3 class="text-xl font-bold text-primary mb-3">🏢 Associate System Engineer | IBM India Pvt. Ltd. | 2018 - 2019</h3>
@@ -458,7 +545,12 @@
                             <li>📚 Created application documentation and led client meetings</li>
                         </ul>
                     </div>
-                    <p class="text-gray-300"><strong>Technologies:</strong> 🏢 Archer-CMS, 🗄️ SQL, ☕ Java, 🤖 Application Automation</p>
+                    <p class="text-gray-300"><strong>Technologies:</strong> 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="Archer-CMS" class="tech-logo-small"> Archer-CMS, 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="SQL" class="tech-logo-small"> SQL, 
+                        <img src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg" alt="Java" class="tech-logo-small"> Java, 
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg" alt="Application Automation" class="tech-logo-small"> Application Automation
+                    </p>
                 </div>
             </div>
         </div>
@@ -551,9 +643,18 @@
                 <div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
                     <h3 class="text-xl font-bold text-primary mb-4">☁️ Cloud & Serverless</h3>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">☁️ AWS</span>
-                        <span class="tech-badge">🏗️ OpenStack</span>
-                        <span class="tech-badge">🐳 Kubernetes</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS" class="tech-logo-badge">
+                            AWS
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://www.svgrepo.com/show/354145/openstack-icon.svg" alt="OpenStack" class="tech-logo-badge">
+                            OpenStack
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg" alt="Kubernetes" class="tech-logo-badge">
+                            Kubernetes
+                        </span>
                     </div>
                     <h4 class="text-sm font-semibold text-white mb-2">Platforms:</h4>
                     <ul class="text-sm text-gray-400 space-y-1">
@@ -567,9 +668,18 @@
                     <h3 class="text-xl font-bold text-primary mb-4">💻 Programming & Development</h3>
                     <h4 class="text-sm font-semibold text-white mb-2">Languages:</h4>
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="tech-badge">☕ Java</span>
-                        <span class="tech-badge">🐍 Python</span>
-                        <span class="tech-badge">🗄️ SQL</span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg" alt="Java" class="tech-logo-badge">
+                            Java
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" class="tech-logo-badge">
+                            Python
+                        </span>
+                        <span class="tech-badge">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="SQL" class="tech-logo-badge">
+                            SQL
+                        </span>
                     </div>
                     <h4 class="text-sm font-semibold text-white mb-2">Tools:</h4>
                     <ul class="text-sm text-gray-400 space-y-1">
@@ -693,13 +803,15 @@
                     🌐 Website
                 </a>
                 <a href="https://github.com/SidAg26" class="social-badge hover:no-underline">
-                    🐙 GitHub Pages
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" class="tech-logo-badge">
+                    GitHub Pages
                 </a>
                 <a href="./blog/index.html" class="social-badge hover:no-underline">
                     📚 Blog
                 </a>
                 <a href="https://www.linkedin.com/in/siddharth26agarwal" class="social-badge hover:no-underline">
-                    💼 LinkedIn
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" class="tech-logo-badge">
+                    LinkedIn
                 </a>
                 <a href="mailto:agasa@unimelb.edu.au" class="social-badge hover:no-underline">
                     📧 Email

@@ -54,9 +54,9 @@
             border-radius: 0.5rem;
         }
         .feature-badge {
-            background: rgba(255, 107, 107, 0.1);
-            color: #ff6b6b;
-            border: 1px solid rgba(255, 107, 107, 0.3);
+            background: rgba(88, 166, 255, 0.1);
+            color: #58a6ff;
+            border: 1px solid rgba(88, 166, 255, 0.3);
             border-radius: 0.5rem;
         }
         .social-badge {
@@ -129,6 +129,7 @@
                 <nav class="hidden md:flex space-x-8">
                     <a href="#about" class="text-secondary hover:text-primary transition-colors">About</a>
                     <a href="#research" class="text-secondary hover:text-primary transition-colors">Research</a>
+                    <a href="#projects" class="text-secondary hover:text-primary transition-colors">Projects</a>
                     <a href="#publications" class="text-secondary hover:text-primary transition-colors">Publications</a>
                     <a href="#experience" class="text-secondary hover:text-primary transition-colors">Experience</a>
                     <a href="#contact" class="text-secondary hover:text-primary transition-colors">Contact</a>
@@ -290,6 +291,136 @@
                         </ul>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="py-20 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-white text-center mb-16">🚀 Research Projects & Tools</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Saarthi -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🧠</div>
+                        <span class="feature-badge">AI-Powered</span>
+                    </div>
+                    <a href="./saarthi.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">Saarthi</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Intelligent serverless computing platform with AI-powered workload prediction, mathematical optimization, and intelligent resource management.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">OpenFaaS</span>
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Kubernetes</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://saarthi.siddharthagarwal.net" target="_blank" rel="noopener" class="social-badge text-sm">Live Demo</a>
+                    </div>
+                </div>
+
+                <!-- Serv-Drishti -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">📊</div>
+                        <span class="feature-badge">Interactive</span>
+                    </div>
+                    <a href="./serverless-visualiser.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">Serv-Drishti</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Interactive visualization tool for serverless computing internals, request routing, resource management, and performance analytics.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">JavaScript</span>
+                        <span class="tech-badge">Chart.js</span>
+                        <span class="tech-badge">Docker</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://serv-drishti.siddharthagarwal.net" target="_blank" rel="noopener" class="social-badge text-sm">Live Demo</a>
+                    </div>
+                </div>
+
+                <!-- DRe-SCale -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🧠</div>
+                        <span class="feature-badge">RL-Based</span>
+                    </div>
+                    <a href="./dre-scale.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">DRe-SCale</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Deep recurrent reinforcement learning method for intelligent autoscaling of serverless functions with LSTM-PPO integration.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">OpenFaaS</span>
+                        <span class="tech-badge">LSTM</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://github.com/SidAg26/DRe-SCale" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- MemFigLess -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🧮</div>
+                        <span class="feature-badge">Cost-Optimized</span>
+                    </div>
+                    <a href="./memfigless.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">MemFigLess</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Input-aware memory configuration for serverless functions using ensemble learning, reducing costs by up to 87%.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">AWS Lambda</span>
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">DynamoDB</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://github.com/SidAg26/MemFigLess" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- OpenFaaS Tutorial -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">📚</div>
+                        <span class="feature-badge">Educational</span>
+                    </div>
+                    <a href="./openfaas-tutorial/openfaas-tutorial.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">OpenFaaS Tutorial</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Comprehensive 8-chapter tutorial on OpenFaaS internals, from gateway to metrics, with practical code examples.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">Go</span>
+                        <span class="tech-badge">Kubernetes</span>
+                        <span class="tech-badge">Docker</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://github.com/SidAg26/OpenFaaS-How-Why-and-Where-in-Code" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
+                    </div>
+                </div>
+
+                <!-- FaaSTrainGym -->
+                <div class="bg-gray-900 rounded-xl p-6 border border-gray-800 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-3xl">🤖</div>
+                        <span class="feature-badge">Serverless RL</span>
+                    </div>
+                    <a href="./faastrain-gym.html" class="block">
+                        <h3 class="text-xl font-bold text-primary mb-3 hover:text-white transition-colors">FaaSTrainGym</h3>
+                    </a>
+                    <p class="text-gray-300 text-sm mb-4">Serverless reinforcement learning training platform combining OpenFaaS with OpenAI Gym for scalable RL pipelines.</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="tech-badge">OpenFaaS</span>
+                        <span class="tech-badge">OpenAI Gym</span>
+                        <span class="tech-badge">Python</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://github.com/SidAg26/FaaSTrainGym" target="_blank" rel="noopener" class="social-badge text-sm">GitHub</a>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>

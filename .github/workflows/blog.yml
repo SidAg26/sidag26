@@ -2,8 +2,8 @@ name: Daily Serverless Blog
 
 on:
   workflow_dispatch: # Manual trigger from any branch
-  schedule:
-    - cron: "0 9 * * 1"  # Daily 9AM UTC
+  # schedule:
+    # - cron: "0 9 * * 1"  # Daily 9AM UTC
   # push:
   #   branches:
   #     - '**'  # All branches

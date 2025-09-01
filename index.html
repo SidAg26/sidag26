@@ -866,26 +866,9 @@
     
     <!-- Theme Toggle Script -->
     <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        
         // Check for saved theme preference or default to dark
         const savedTheme = localStorage.getItem('theme') || 'dark';
-        html.className = savedTheme;
-        updateThemeIcon(savedTheme);
-        
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.className;
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.className = newTheme;
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-        
-        function updateThemeIcon(theme) {
-            themeToggle.innerHTML = theme === 'dark' ? '🌙' : '☀️';
-        }
+        document.documentElement.className = savedTheme;
         
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -903,8 +886,14 @@
         
         // Newsletter subscription form
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if EmailJS is loaded
+            if (typeof emailjs === 'undefined') {
+                console.error('EmailJS is not loaded!');
+                return;
+            }
+            
             // Initialize EmailJS
-            emailjs.init("YOUR_PUBLIC_KEY"); // You'll replace this with your actual key
+            emailjs.init("X5bxJSso1RWsYmbAv");
             
             const newsletterForm = document.getElementById('newsletter-form');
             const emailInput = document.getElementById('newsletter-email');
@@ -918,7 +907,9 @@
                     e.preventDefault();
                     
                     const email = emailInput.value.trim();
-                    if (!email) return;
+                    if (!email) {
+                        return;
+                    }
                     
                     // Show loading state
                     subscribeBtn.disabled = true;
@@ -927,20 +918,16 @@
                     
                     // EmailJS template parameters
                     const templateParams = {
-                        to_email: 'agasa@unimelb.edu.au', // Your email address
                         from_email: email,
-                        message: `New newsletter subscription from: ${email}`,
-                        subject: 'New Blog Newsletter Subscription'
+                        message: `New newsletter subscription from: ${email}`
                     };
                     
                     // Send email using EmailJS
-                    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                    emailjs.send('service_sgpf3nd', 'template_88c5fum', templateParams)
                         .then(function(response) {
-                            console.log('SUCCESS!', response.status, response.text);
                             showMessage('✅ Successfully subscribed! You\'ll receive updates about new blog posts.', 'success');
                             emailInput.value = '';
                         }, function(error) {
-                            console.log('FAILED...', error);
                             showMessage('❌ Something went wrong. Please try again or contact me directly.', 'error');
                         })
                         .finally(function() {
